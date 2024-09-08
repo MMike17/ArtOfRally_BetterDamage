@@ -1,5 +1,6 @@
 ﻿using HarmonyLib;
 using System;
+using System.Reflection;
 using UnityModManagerNet;
 
 using static UnityModManagerNet.UnityModManager;
@@ -51,6 +52,36 @@ namespace BetterDamage
             {
                 Log(e.ToString());
             }
+        }
+
+        // TODO : Add these to the ModBase template repository
+
+        /// <summary>BindingFlags.NonPrivate is implicit</summary>
+        public static T GetField<T, U>(U source, string fieldName, BindingFlags flags)
+        {
+            FieldInfo info = source.GetType().GetField(fieldName, flags | BindingFlags.NonPublic);
+
+            if (info == null)
+            {
+                Main.Error("Couldn't find field info for field \"" + fieldName + "\" in type \"" + source.GetType() + "\"");
+                return default(T);
+            }
+
+            return (T)info.GetValue(source);
+        }
+
+        /// <summary>BindingFlags.NonPrivate is implicit</summary>
+        public static void InvokeMethod<T>(T source, string methodName, BindingFlags flags, object[] args)
+        {
+            MethodInfo info = source.GetType().GetMethod(methodName, flags | BindingFlags.NonPublic);
+
+            if (info == null)
+            {
+                Main.Error("Couldn't find method info for method \"" + methodName + "\" in type \"" + source.GetType() + "\"");
+                return;
+            }
+
+            info.Invoke(source, args);
         }
     }
 }
