@@ -72,44 +72,6 @@ namespace BetterDamage
                     {
                         if (collInfo.collider.CompareTag("Road"))
                         {
-                            float landingForce = -collInfo.relativeVelocity.y;
-                            Main.Log("Landed with force : " + landingForce);
-
-                            if (Main.settings.enableLandingDamage && landingForce > Main.settings.minLandingThreshold)
-                            {
-                                // tire puncture
-                                if (Random.Range(0, 100) < Main.settings.landingPunctureProbability)
-                                {
-                                    List<Wheel> wheels = Main.GetField<List<Wheel>, PlayerCollider>(__instance, "wheels", BindingFlags.Instance);
-                                    List<Wheel> availableWheels = new List<Wheel>();
-
-                                    wheels.ForEach(wheel =>
-                                    {
-                                        if (!wheel.tirePuncture)
-                                            availableWheels.Add(wheel);
-                                    });
-
-                                    // all wheels are punctured => abort
-                                    if (availableWheels.Count == 0)
-                                    {
-                                        Main.Log("All wheels are punctured. Aborting.");
-                                        return;
-                                    }
-
-                                    CarUtils.PunctureTire(__instance, availableWheels[Random.Range(0, availableWheels.Count)]);
-                                }
-                                else // damage suspension (we don't damage suspension and puncture tire at the same time)
-                                {
-                                    float magnitudePercent = Mathf.InverseLerp(
-                                        Main.settings.minLandingThreshold,
-                                        Main.settings.maxLandingThreshold,
-                                        landingForce
-                                    );
-
-                                    CarUtils.DamagePart(__instance, magnitudePercent, SystemToRepair.SUSPENSION);
-                                }
-                            }
-
                             // skip the normal damage calculations
                             return;
                         }
