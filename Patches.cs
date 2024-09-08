@@ -1,5 +1,4 @@
 using HarmonyLib;
-using System;
 using System.Collections.Generic;
 using System.Reflection;
 using UnityEngine;
@@ -97,14 +96,7 @@ namespace BetterDamage
                                         return;
                                     }
 
-                                    availableWheels[Random.Range(0, availableWheels.Count)].DoTirePuncture();
-                                    GameEntryPoint.EventManager.hudManager.ShowTirePunctureWarning();
-
-                                    Main.GetField<SoundController, PlayerCollider>(
-                                        __instance,
-                                        "soundController",
-                                        BindingFlags.Instance
-                                    ).PlayTirePunctureSound();
+                                    CarUtils.PunctureTire(__instance, availableWheels[Random.Range(0, availableWheels.Count)]);
                                 }
                                 else // damage suspension (we don't damage suspension and puncture tire at the same time)
                                 {
@@ -114,7 +106,7 @@ namespace BetterDamage
                                         landingForce
                                     );
 
-                                    DamagePart(__instance, magnitudePercent, SystemToRepair.SUSPENSION);
+                                    CarUtils.DamagePart(__instance, magnitudePercent, SystemToRepair.SUSPENSION);
                                 }
                             }
 
@@ -143,68 +135,6 @@ namespace BetterDamage
                     // TODO : Do damage headlights check (check if we collided in the direction of headlights)
                 }
             });
-        }
-
-        static bool IsPartTarget(PerformanceDamage part, SystemToRepair target)
-        {
-            switch (part)
-            {
-                case AerodynamicsPerformanceDamage body:
-                    return target == SystemToRepair.CLEANCAR;
-
-                case SteeringPerfomanceDamage suspension:
-                    return target == SystemToRepair.SUSPENSION;
-
-                case RadiatorPerformanceDamage radiator:
-                    return target == SystemToRepair.RADIATOR;
-
-                case EnginePerformanceDamage engine:
-                    return target == SystemToRepair.ENGINE;
-
-                case TurboPerformanceDamage turbo:
-                    return target == SystemToRepair.TURBO;
-
-                case TransmissionPerformanceDamage gearbox:
-                    return target == SystemToRepair.GEARBOX;
-
-                default:
-                    throw new Exception("Didn't recognize the part");
-            }
-        }
-
-        static void DamagePart(PlayerCollider collider, float magnitudePercent, SystemToRepair targetPart)
-        {
-            float maxDamage = Main.GetField<float, PlayerCollider>(collider, "MaxDamage", BindingFlags.Instance);
-            float multiplier = 0.5f;
-
-            if (GameModeManager.GameMode == GameModeManager.GAME_MODES.CAREER)
-                multiplier = SaveGame.GetInt("SETTINGS_CAREER_DAMAGE_LEVEL", 0) / 4f;
-            else if (GameModeManager.GameMode == GameModeManager.GAME_MODES.CUSTOM)
-                multiplier = SaveGame.GetInt("SETTINGS_CUSTOM_RALLY_DAMAGE_LEVEL", 0) / 4f;
-
-            float totalDamage = magnitudePercent * maxDamage * multiplier;
-
-            List<PerformanceDamage> partsList = Main.GetField<List<PerformanceDamage>, PerformanceDamageManager>(
-                GameEntryPoint.EventManager.playerManager.performanceDamageManager,
-                "DamageablePartsList",
-                BindingFlags.Instance
-            );
-            PerformanceDamage selectedPart = partsList.Find(part => IsPartTarget(part, targetPart));
-
-            if (selectedPart == null)
-            {
-                Main.Error("Couldn't find part for target : " + targetPart + ". Aborting.");
-                return;
-            }
-
-            int index = partsList.IndexOf(selectedPart);
-
-            Main.InvokeMethod(
-                GameEntryPoint.EventManager.playerManager.performanceDamageManager,
-                "DamageComponent",
-                BindingFlags.Instance,
-                new object[] { totalDamage, index }
-            );
         }
     }
 }
