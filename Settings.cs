@@ -21,6 +21,9 @@ namespace BetterDamage
         [Draw(DrawType.Slider, Min = 0, Max = 5, VisibleOn = "enableLandingDamage|true", Precision = 1)]
         public float landingPunctureProbability = 0.5f;
 
+        [Draw(DrawType.Slider, Min = 0, Max = 1, VisibleOn = "enableLandingDamage|true")]
+        public float landingDamageMultiplier = 0.3f;
+
         // TODO : Add puncture probability on crash
         // TODO : Add headlight damage probability on crash
 

@@ -166,7 +166,7 @@ namespace BetterDamage
                     float magnitudePercent = Mathf.InverseLerp(
                         Main.settings.minLandingThreshold,
                         Main.settings.maxLandingThreshold,
-                        landingForce
+                        landingForce * Main.settings.landingDamageMultiplier
                     );
 
                     CarUtils.DamagePart(collider, magnitudePercent, SystemToRepair.SUSPENSION);
