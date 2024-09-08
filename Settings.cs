@@ -1,7 +1,7 @@
 using UnityModManagerNet;
 using static UnityModManagerNet.UnityModManager;
 
-namespace ModBase
+namespace BetterDamage
 {
     public class Settings : ModSettings, IDrawable
     {

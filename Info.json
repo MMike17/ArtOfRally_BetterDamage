@@ -1,9 +1,9 @@
 {
-	"Id": "ModBase",
-	"DisplayName": "ModBase",
+	"Id": "BetterDamage",
+	"DisplayName": "Better Damage",
 	"Author": "MMike17",
-	"Version": "1.0.0",
+	"Version": "0.9.0",
 	"GameVersion": "1.5,5",
-	"AssemblyName": "ModBase.dll",
-	"EntryMethod": "ModBase.Main.Load"
+	"AssemblyName": "BetterDamage.dll",
+	"EntryMethod": "BetterDamage.Main.Load"
 }

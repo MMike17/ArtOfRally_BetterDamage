@@ -7,8 +7,8 @@
     <ProjectGuid>{26DC118B-DB3A-4469-91C5-FCDDF5C152B5}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>ModBase</RootNamespace>
-    <AssemblyName>ModBase</AssemblyName>
+    <RootNamespace>BetterDamage</RootNamespace>
+    <AssemblyName>BetterDamage</AssemblyName>
     <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <Deterministic>true</Deterministic>
@@ -86,10 +86,10 @@
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Target Name="CopyInfo" AfterTargets="BeforeBuild">
-    <Copy SourceFiles="Info.json" DestinationFolder="D:\SteamLibrary\steamapps\common\artofrally\Mods\ModBase" />
+    <Copy SourceFiles="Info.json" DestinationFolder="D:\SteamLibrary\steamapps\common\artofrally\Mods\BetterDamage" />
   </Target>
   <Target Name="CopyDll" AfterTargets="Build">
-    <Copy SourceFiles="bin\Debug\ModBase.dll" DestinationFolder="D:\SteamLibrary\steamapps\common\artofrally\Mods\ModBase" />
+    <Copy SourceFiles="bin\Debug\BetterDamage.dll" DestinationFolder="D:\SteamLibrary\steamapps\common\artofrally\Mods\BetterDamage" />
   </Target>
   <Target Name="StartGame" AfterTargets="AfterBuild">
     <Exec Command="&quot;D:\Games\Current\art of rally.url&quot;" />

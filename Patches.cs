@@ -1,6 +1,6 @@
 using HarmonyLib;
 
-namespace ModBase
+namespace BetterDamage
 {
 	// Patch model
 	// [HarmonyPatch(typeof(), nameof())]
