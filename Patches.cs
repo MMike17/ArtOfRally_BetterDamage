@@ -129,6 +129,8 @@ namespace BetterDamage
             Rigidbody rigidbody = Main.GetField<Rigidbody, Arcader>(__instance, "body", BindingFlags.Instance);
             float landingForce = -rigidbody.velocity.y;
 
+            Main.Log("Detected landing with force : " + landingForce);
+
             if (landingForce > Main.settings.minLandingThreshold)
             {
                 if (collider == null)
@@ -162,12 +164,11 @@ namespace BetterDamage
                 }
                 else // damage suspension (we don't damage suspension and puncture tire at the same time)
                 {
-                    // TODO : This damage is way too high
                     float magnitudePercent = Mathf.InverseLerp(
                         Main.settings.minLandingThreshold,
                         Main.settings.maxLandingThreshold,
-                        landingForce * Main.settings.landingDamageMultiplier
-                    );
+                        landingForce
+                    ) * Main.settings.landingDamageMultiplier * 0.07f;
 
                     CarUtils.DamagePart(collider, magnitudePercent, SystemToRepair.SUSPENSION);
                 }

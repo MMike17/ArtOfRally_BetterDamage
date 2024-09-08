@@ -17,12 +17,11 @@ namespace BetterDamage
         public float minLandingThreshold = 5;
         [Draw(DrawType.Slider, Min = 5, Max = 20, VisibleOn = "enableLandingDamage|true", Precision = 1)]
         public float maxLandingThreshold = 13;
+        [Draw(DrawType.Slider, Min = 0, Max = 2, VisibleOn = "enableLandingDamage|true")]
+        public float landingDamageMultiplier = 1;
 
         [Draw(DrawType.Slider, Min = 0, Max = 5, VisibleOn = "enableLandingDamage|true", Precision = 1)]
         public float landingPunctureProbability = 0.5f;
-
-        [Draw(DrawType.Slider, Min = 0, Max = 1, VisibleOn = "enableLandingDamage|true")]
-        public float landingDamageMultiplier = 0.3f;
 
         // TODO : Add puncture probability on crash
         // TODO : Add headlight damage probability on crash
