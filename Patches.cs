@@ -23,14 +23,13 @@ namespace BetterDamage
     // 	}
     // }
 
-    // TODO : damage radiator when bump (detect the direction of bump)
-
     // TARGETS :
 
     // TODO : damage tires when you drift (detect when we drift/slip / chance of puncture)
     // TODO : damage gearbox when you shift down and over rev / shift R when going forward / shift 1 when going back(complex to detect)
     // TODO : damage engine whe you over rev (detect over rev)
-    // TODO : damage suspensions when bump (detect the direction of bump)
+    // TODO : damage suspensions when bump or land (detect the direction of bump)
+    // TODO : damage radiator when bump (detect the direction of bump)
     // TODO : damage turbo when overheat (detect when we overheat ? compare rev to forward speed / rev > ProjectForward(maxSpeed / 10))
 
     // replaces the way car damage is decided
@@ -64,15 +63,47 @@ namespace BetterDamage
                     BindingFlags.Instance
                 );
 
-                if (collInfo.relativeVelocity.magnitude > MIN_CRASH_MAGNITUDE &&
-                    !collInfo.collider.CompareTag("Road") &&
-                    GameModeManager.GameMode != GameModeManager.GAME_MODES.FREEROAM)
+                if (GameModeManager.GameMode != GameModeManager.GAME_MODES.FREEROAM)
                 {
+                    bool crash = collInfo.relativeVelocity.magnitude > MIN_CRASH_MAGNITUDE;
+
                     if (isPerformanceDamageEnabled)
                     {
-                        // TODO : Damage shock parts here
-                        // TODO : Damage radiator
+                        if (collInfo.collider.CompareTag("Road"))
+                        {
+                            if (Main.settings.enableLandingDamage && Mathf.Abs(collInfo.relativeVelocity.y) > Main.settings.landingThreshold)
+                            {
+                                // TODO : Damage suspensions on landing
+
+                                // tire puncture
+                                if (Random.Range(0, 100) < Main.settings.landingPunctureProbability)
+                                {
+                                    List<Wheel> wheels = Main.GetField<List<Wheel>, PlayerCollider>(__instance, "wheels", BindingFlags.Instance);
+                                    Wheel selected = wheels.Find(wheel => !wheel.tirePuncture);
+
+                                    selected.DoTirePuncture();
+                                    GameEntryPoint.EventManager.hudManager.ShowTirePunctureWarning();
+
+                                    Main.GetField<SoundController, PlayerCollider>(
+                                        __instance,
+                                        "soundController",
+                                        BindingFlags.Instance
+                                    ).PlayTirePunctureSound();
+                                }
+                            }
+
+                            // skip the normal damage calculations
+                            return;
+                        }
+                        else if (crash)
+                        {
+                            // TODO : Damage radiator
+                            // TODO : Damage suspensions
+                        }
                     }
+
+                    if (!crash)
+                        return;
 
                     int probability = Random.Range(0, 100);
 
