@@ -71,12 +71,7 @@ namespace BetterDamage
 
                     if (isPerformanceDamageEnabled)
                     {
-                        if (collInfo.collider.CompareTag("Road"))
-                        {
-                            // skip the normal damage calculations
-                            return;
-                        }
-                        else if (crash)
+                        if (crash)
                         {
                             //float MAX_CRASH_MAGNITUDE = Main.GetField<float, PlayerCollider>(
                             //    __instance,
@@ -143,7 +138,13 @@ namespace BetterDamage
                 }
 
                 // tire puncture
-                if (Random.Range(0, 100) < Main.settings.landingPunctureProbability)
+                float magnitudePercent = Mathf.InverseLerp(
+                    Main.settings.minLandingThreshold,
+                    Main.settings.maxLandingThreshold,
+                    landingForce
+                );
+
+                if (magnitudePercent >= Main.settings.landingPunctureThreshold && Random.Range(0, 100) < Main.settings.landingPunctureProbability)
                 {
                     List<Wheel> wheels = Main.GetField<List<Wheel>, PlayerCollider>(collider, "wheels", BindingFlags.Instance);
                     List<Wheel> availableWheels = new List<Wheel>();
@@ -164,12 +165,7 @@ namespace BetterDamage
                 }
                 else // damage suspension (we don't damage suspension and puncture tire at the same time)
                 {
-                    float magnitudePercent = Mathf.InverseLerp(
-                        Main.settings.minLandingThreshold,
-                        Main.settings.maxLandingThreshold,
-                        landingForce
-                    ) * Main.settings.landingDamageMultiplier * 0.07f;
-
+                    magnitudePercent *= Main.settings.landingDamageMultiplier * 0.1f;
                     CarUtils.DamagePart(collider, magnitudePercent, SystemToRepair.SUSPENSION);
                 }
             }
