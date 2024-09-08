@@ -1,4 +1,5 @@
 using HarmonyLib;
+using System.Collections;
 using System.Collections.Generic;
 using System.Reflection;
 using UnityEngine;
@@ -103,54 +104,74 @@ namespace BetterDamage
     [HarmonyPatch(typeof(Arcader), "TryToStickLanding")]
     static class Arcader_TryToStickLanding_Patch
     {
+        static PlayerCollider collider;
+        static Coroutine waitRoutine;
+
         static void Prefix(Arcader __instance)
         {
             if (!Main.enabled ||
                 GameModeManager.GameMode == GameModeManager.GAME_MODES.FREEROAM ||
-                GameEntryPoint.EventManager.status != EventStatusEnums.EventStatus.UNDERWAY)
+                GameEntryPoint.EventManager.status != EventStatusEnums.EventStatus.UNDERWAY ||
+                !Main.settings.enableLandingDamage)
                 return;
 
-            // TODO : call custom collision event
+            if (waitRoutine != null)
+                __instance.StopCoroutine("WaitForLanding");
+
+            waitRoutine = __instance.StartCoroutine(WaitForLanding(__instance));
+        }
+
+        static IEnumerator WaitForLanding(Arcader __instance)
+        {
+            yield return new WaitForSeconds(0.1f);
+            yield return new WaitUntil(() => !Main.GetField<bool, Arcader>(__instance, "isCarAirborne", BindingFlags.Instance));
 
             Rigidbody rigidbody = Main.GetField<Rigidbody, Arcader>(__instance, "body", BindingFlags.Instance);
+            float landingForce = -rigidbody.velocity.y;
 
-            float landingForce = rigidbody.velocity.y;
-            Main.Log("Landed with force : " + landingForce);
+            if (landingForce > Main.settings.minLandingThreshold)
+            {
+                if (collider == null)
+                    collider = GameObject.FindObjectOfType<PlayerCollider>();
 
-            //if (Main.settings.enableLandingDamage && landingForce > Main.settings.minLandingThreshold)
-            //{
-            //    // tire puncture
-            //    if (Random.Range(0, 100) < Main.settings.landingPunctureProbability)
-            //    {
-            //        List<Wheel> wheels = Main.GetField<List<Wheel>, PlayerCollider>(__instance, "wheels", BindingFlags.Instance);
-            //        List<Wheel> availableWheels = new List<Wheel>();
+                if (collider == null)
+                {
+                    Main.Error("Couldn't find PlayerCollider. This is a major bug.");
+                    yield break;
+                }
 
-            //        wheels.ForEach(wheel =>
-            //        {
-            //            if (!wheel.tirePuncture)
-            //                availableWheels.Add(wheel);
-            //        });
+                // tire puncture
+                if (Random.Range(0, 100) < Main.settings.landingPunctureProbability)
+                {
+                    List<Wheel> wheels = Main.GetField<List<Wheel>, PlayerCollider>(collider, "wheels", BindingFlags.Instance);
+                    List<Wheel> availableWheels = new List<Wheel>();
 
-            //        // all wheels are punctured => abort
-            //        if (availableWheels.Count == 0)
-            //        {
-            //            Main.Log("All wheels are punctured. Aborting.");
-            //            return;
-            //        }
+                    wheels.ForEach(wheel =>
+                    {
+                        if (!wheel.tirePuncture)
+                            availableWheels.Add(wheel);
+                    });
 
-            //        CarUtils.PunctureTire(__instance, availableWheels[Random.Range(0, availableWheels.Count)]);
-            //    }
-            //    else // damage suspension (we don't damage suspension and puncture tire at the same time)
-            //    {
-            //        float magnitudePercent = Mathf.InverseLerp(
-            //            Main.settings.minLandingThreshold,
-            //            Main.settings.maxLandingThreshold,
-            //            landingForce
-            //        );
+                    if (availableWheels.Count == 0)
+                    {
+                        Main.Log("All wheels are punctured. Aborting.");
+                        yield break;
+                    }
 
-            //        CarUtils.DamagePart(__instance, magnitudePercent, SystemToRepair.SUSPENSION);
-            //    }
-            //}
+                    CarUtils.PunctureTire(collider, availableWheels[Random.Range(0, availableWheels.Count)]);
+                }
+                else // damage suspension (we don't damage suspension and puncture tire at the same time)
+                {
+                    // TODO : This damage is way too high
+                    float magnitudePercent = Mathf.InverseLerp(
+                        Main.settings.minLandingThreshold,
+                        Main.settings.maxLandingThreshold,
+                        landingForce
+                    );
+
+                    CarUtils.DamagePart(collider, magnitudePercent, SystemToRepair.SUSPENSION);
+                }
+            }
         }
     }
 }
