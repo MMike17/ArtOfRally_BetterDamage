@@ -50,11 +50,9 @@ namespace BetterDamage
             }
             catch (Exception e)
             {
-                Log(e.ToString());
+                Error(e.ToString());
             }
         }
-
-        // TODO : Add these to the ModBase template repository
 
         /// <summary>BindingFlags.NonPrivate is implicit</summary>
         public static T GetField<T, U>(U source, string fieldName, BindingFlags flags)
@@ -63,7 +61,7 @@ namespace BetterDamage
 
             if (info == null)
             {
-                Main.Error("Couldn't find field info for field \"" + fieldName + "\" in type \"" + source.GetType() + "\"");
+                Error("Couldn't find field info for field \"" + fieldName + "\" in type \"" + source.GetType() + "\"");
                 return default(T);
             }
 
@@ -77,7 +75,7 @@ namespace BetterDamage
 
             if (info == null)
             {
-                Main.Error("Couldn't find method info for method \"" + methodName + "\" in type \"" + source.GetType() + "\"");
+                Error("Couldn't find method info for method \"" + methodName + "\" in type \"" + source.GetType() + "\"");
                 return;
             }
 
