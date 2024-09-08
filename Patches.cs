@@ -99,4 +99,58 @@ namespace BetterDamage
             });
         }
     }
+
+    [HarmonyPatch(typeof(Arcader), "TryToStickLanding")]
+    static class Arcader_TryToStickLanding_Patch
+    {
+        static void Prefix(Arcader __instance)
+        {
+            if (!Main.enabled ||
+                GameModeManager.GameMode == GameModeManager.GAME_MODES.FREEROAM ||
+                GameEntryPoint.EventManager.status != EventStatusEnums.EventStatus.UNDERWAY)
+                return;
+
+            // TODO : call custom collision event
+
+            Rigidbody rigidbody = Main.GetField<Rigidbody, Arcader>(__instance, "body", BindingFlags.Instance);
+
+            float landingForce = rigidbody.velocity.y;
+            Main.Log("Landed with force : " + landingForce);
+
+            //if (Main.settings.enableLandingDamage && landingForce > Main.settings.minLandingThreshold)
+            //{
+            //    // tire puncture
+            //    if (Random.Range(0, 100) < Main.settings.landingPunctureProbability)
+            //    {
+            //        List<Wheel> wheels = Main.GetField<List<Wheel>, PlayerCollider>(__instance, "wheels", BindingFlags.Instance);
+            //        List<Wheel> availableWheels = new List<Wheel>();
+
+            //        wheels.ForEach(wheel =>
+            //        {
+            //            if (!wheel.tirePuncture)
+            //                availableWheels.Add(wheel);
+            //        });
+
+            //        // all wheels are punctured => abort
+            //        if (availableWheels.Count == 0)
+            //        {
+            //            Main.Log("All wheels are punctured. Aborting.");
+            //            return;
+            //        }
+
+            //        CarUtils.PunctureTire(__instance, availableWheels[Random.Range(0, availableWheels.Count)]);
+            //    }
+            //    else // damage suspension (we don't damage suspension and puncture tire at the same time)
+            //    {
+            //        float magnitudePercent = Mathf.InverseLerp(
+            //            Main.settings.minLandingThreshold,
+            //            Main.settings.maxLandingThreshold,
+            //            landingForce
+            //        );
+
+            //        CarUtils.DamagePart(__instance, magnitudePercent, SystemToRepair.SUSPENSION);
+            //    }
+            //}
+        }
+    }
 }

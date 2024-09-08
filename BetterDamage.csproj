@@ -87,7 +87,6 @@
     <Compile Include="Main.cs" />
     <Compile Include="Settings.cs" />
     <Compile Include="Patches.cs" />
-    <Compile Include="WheelsManager.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Target Name="CopyInfo" AfterTargets="BeforeBuild">

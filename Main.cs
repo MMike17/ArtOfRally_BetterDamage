@@ -26,7 +26,6 @@ namespace BetterDamage
 
             // hook in mod manager event
             modEntry.OnToggle = OnToggle;
-            modEntry.OnUpdate = OnUpdate;
             modEntry.OnGUI = (entry) => settings.Draw(entry);
             modEntry.OnSaveGUI = (entry) => settings.Save(entry);
 
@@ -81,14 +80,6 @@ namespace BetterDamage
             }
 
             info.Invoke(source, args);
-        }
-
-        static void OnUpdate(ModEntry entry, float deltaTime)
-        {
-            Try(() =>
-            {
-                WheelsManager.OnUpdate();
-            });
         }
     }
 }
