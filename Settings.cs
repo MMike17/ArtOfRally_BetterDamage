@@ -13,10 +13,10 @@ namespace BetterDamage
         [Draw(DrawType.Toggle)]
         public bool enableLandingDamage;
 
-        [Draw(DrawType.Slider, Min = 1, Max = 5, VisibleOn = "enableLandingDamage|true", Precision = 1)]
-        public float minLandingThreshold = 1.5f;
         [Draw(DrawType.Slider, Min = 3, Max = 8, VisibleOn = "enableLandingDamage|true", Precision = 1)]
-        public float maxLandingThreshold = 5;
+        public float minLandingThreshold = 5;
+        [Draw(DrawType.Slider, Min = 5, Max = 20, VisibleOn = "enableLandingDamage|true", Precision = 1)]
+        public float maxLandingThreshold = 13;
 
         [Draw(DrawType.Slider, Min = 0, Max = 5, VisibleOn = "enableLandingDamage|true", Precision = 1)]
         public float landingPunctureProbability = 0.5f;
