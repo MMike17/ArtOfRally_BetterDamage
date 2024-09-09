@@ -30,14 +30,18 @@ namespace BetterDamage
     // TODO : damage tires when you drift (detect when we drift/slip / chance of puncture)
     // TODO : damage gearbox when you shift down and over rev / shift R when going forward / shift 1 when going back(complex to detect)
     // TODO : damage engine whe you over rev (detect over rev)
-    // TODO : damage suspensions when bump or land (detect the direction of bump)
-    // TODO : damage radiator when bump (detect the direction of bump)
+    // TODO : damage suspensions when bump (detect the direction of bump
     // TODO : damage turbo when overheat (detect when we overheat ? compare rev to forward speed / rev > ProjectForward(maxSpeed / 10))
 
     // replaces the way car damage is decided
     [HarmonyPatch(typeof(PlayerCollider), "CheckForPunctureAndPerformanceDamage")]
     static class PlayerCollider_CheckForPunctureAndPerformanceDamage_Patch
     {
+        const float WHEEL_CHECK_ANGLE = 10;
+
+        static Dictionary<Wheel, float> toWheelsAngles;
+        static float radiatorAngle;
+
         static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> instructions)
         {
             // skip execution
@@ -65,37 +69,60 @@ namespace BetterDamage
                     BindingFlags.Instance
                 );
 
-                if (GameModeManager.GameMode != GameModeManager.GAME_MODES.FREEROAM)
+                if (GameModeManager.GameMode != GameModeManager.GAME_MODES.FREEROAM && collInfo.relativeVelocity.magnitude > MIN_CRASH_MAGNITUDE)
                 {
-                    bool crash = collInfo.relativeVelocity.magnitude > MIN_CRASH_MAGNITUDE;
+                    if (toWheelsAngles == null || toWheelsAngles.ContainsKey(null) || radiatorAngle == 0)
+                        GenerateWheelAngles();
 
                     if (isPerformanceDamageEnabled)
                     {
-                        if (crash)
-                        {
-                            //float MAX_CRASH_MAGNITUDE = Main.GetField<float, PlayerCollider>(
-                            //    __instance,
-                            //    "MAX_MAGNITUDE_CRASH",
-                            //    BindingFlags.Instance
-                            //);
+                        Transform player = GameEntryPoint.EventManager.playerManager.PlayerObject.transform;
+                        float damageAngle = Vector3.SignedAngle(player.forward, collInfo.contacts[0].point - player.position, player.up);
 
-                            // TODO : Damage radiator
-                            // TODO : Damage suspensions
+                        if ((damageAngle > 0 ? damageAngle : -damageAngle) < radiatorAngle)
+                        {
+                            float MAX_CRASH_MAGNITUDE = Main.GetField<float, PlayerCollider>(
+                                __instance,
+                                "MAX_MAGNITUDE_CRASH",
+                                BindingFlags.Instance
+                            );
+
+                            float magnitudePercent = Mathf.InverseLerp(
+                                MIN_CRASH_MAGNITUDE,
+                                MAX_CRASH_MAGNITUDE,
+                                collInfo.relativeVelocity.magnitude
+                            );
+
+                            CarUtils.DamagePart(__instance, magnitudePercent, SystemToRepair.RADIATOR);
+                            return;
                         }
+
+                        // TODO : Damage suspensions
                     }
 
-                    if (!crash)
-                        return;
-
-                    int probability = Random.Range(0, 100);
+                    // int probability = Random.Range(0, 100);
 
                     // TODO : Do puncture check (check if we collided in the direction of wheels)
                     // TODO : Do damage headlights check (check if we collided in the direction of headlights)
                 }
             });
         }
+
+        static void GenerateWheelAngles()
+        {
+            toWheelsAngles = new Dictionary<Wheel, float>();
+            Wheel[] wheels = GameEntryPoint.EventManager.playerManager.axles.allWheels;
+            Transform player = GameEntryPoint.EventManager.playerManager.PlayerObject.transform;
+
+            // we only care about the 4 first wheels (front and back)
+            for (int i = 0; i < 4; i++)
+                toWheelsAngles.Add(wheels[i], Vector3.SignedAngle(player.forward, wheels[i].transform.position - player.position, player.up));
+
+            radiatorAngle = toWheelsAngles[wheels[1]] - WHEEL_CHECK_ANGLE / 2;
+        }
     }
 
+    // apply damage on landing (suspensions and tires)
     [HarmonyPatch(typeof(Arcader), "TryToStickLanding")]
     static class Arcader_TryToStickLanding_Patch
     {
@@ -121,8 +148,7 @@ namespace BetterDamage
             yield return new WaitForSeconds(0.1f);
             yield return new WaitUntil(() => !Main.GetField<bool, Arcader>(__instance, "isCarAirborne", BindingFlags.Instance));
 
-            Rigidbody rigidbody = Main.GetField<Rigidbody, Arcader>(__instance, "body", BindingFlags.Instance);
-            float landingForce = -rigidbody.velocity.y;
+            float landingForce = -GameEntryPoint.EventManager.playerManager.playerRigidBody.velocity.y;
 
             Main.Log("Detected landing with force : " + landingForce);
 
@@ -144,16 +170,16 @@ namespace BetterDamage
                     landingForce
                 );
 
-                if (magnitudePercent >= Main.settings.landingPunctureThreshold && Random.Range(0, 100) < Main.settings.landingPunctureProbability)
+                if (magnitudePercent * 100 >= Main.settings.landingPunctureThreshold &&
+                    Random.Range(0, 100) < Main.settings.landingPunctureProbability)
                 {
-                    List<Wheel> wheels = Main.GetField<List<Wheel>, PlayerCollider>(collider, "wheels", BindingFlags.Instance);
                     List<Wheel> availableWheels = new List<Wheel>();
 
-                    wheels.ForEach(wheel =>
+                    foreach (Wheel wheel in GameEntryPoint.EventManager.playerManager.axles.allWheels)
                     {
                         if (!wheel.tirePuncture)
                             availableWheels.Add(wheel);
-                    });
+                    }
 
                     if (availableWheels.Count == 0)
                     {
