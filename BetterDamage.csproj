@@ -35,6 +35,10 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\..\..\..\SteamLibrary\steamapps\common\artofrally\artofrally_Data\Managed\UnityModManager\0Harmony.dll</HintPath>
     </Reference>
+    <Reference Include="ACTk.Runtime, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\..\..\SteamLibrary\steamapps\common\artofrally\artofrally_Data\Managed\ACTk.Runtime.dll</HintPath>
+    </Reference>
     <Reference Include="Assembly-CSharp, Version=0.0.1.21672, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\..\..\..\SteamLibrary\steamapps\common\artofrally\artofrally_Data\Managed\Assembly-CSharp.dll</HintPath>
