@@ -39,9 +39,12 @@ namespace BetterDamage
     {
         const float WHEEL_CHECK_ANGLE = 10;
 
+        public static float tiltToApply;
+
         static PlayerCollider player;
         // front 0 1 / back 2 3
         static float[] wheelsAngles;
+        // TODO : Turn this array into an array of min/max values
         static float radiatorAngle;
 
         static bool Prefix(PlayerCollider __instance, Collision collInfo)
@@ -81,13 +84,23 @@ namespace BetterDamage
                             return;
                         }
 
-                        // TODO : Damage suspensions
                         for (int i = 0; i < wheelsAngles.Length; i++)
                         {
-                            // TODO : Change how suspensions take damage
-                            // TODO : Add tilt if we hit 0 or 1
-                            float currentWheelAngle = wheelsAngles[i];
-                            //if (damageAngle <)
+                            float angle = wheelsAngles[i];
+                            float min = angle - WHEEL_CHECK_ANGLE / 2;
+                            float max = min + WHEEL_CHECK_ANGLE;
+
+                            if (damageAngle > min && damageAngle < max)
+                            {
+                                // if we are on the front suspensions
+                                if (i <= 1)
+                                {
+                                    // TODO : Add tilt if we hit 0 or 1
+                                    // tiltToApply
+                                }
+
+                                CarUtils.DamagePart(__instance, magnitudePercent, SystemToRepair.SUSPENSION);
+                            }
                         }
                     }
 
@@ -202,4 +215,6 @@ namespace BetterDamage
             }
         }
     }
+
+    // TODO : Override how SteeringPerformanceDamage.SetPerformance applies damage to the suspensions
 }
