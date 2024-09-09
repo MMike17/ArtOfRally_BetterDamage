@@ -39,7 +39,9 @@ namespace BetterDamage
     {
         const float WHEEL_CHECK_ANGLE = 10;
 
-        static Dictionary<Wheel, float> toWheelsAngles;
+        static PlayerCollider player;
+        // front 0 1 / back 2 3
+        static float[] wheelsAngles;
         static float radiatorAngle;
 
         static bool Prefix(PlayerCollider __instance, Collision collInfo)
@@ -58,32 +60,35 @@ namespace BetterDamage
 
                 if (GameModeManager.GameMode != GameModeManager.GAME_MODES.FREEROAM && collInfo.relativeVelocity.magnitude > MIN_CRASH_MAGNITUDE)
                 {
-                    GenerateIfNeeded();
+                    GenerateIfNeeded(__instance);
 
                     if (isPerformanceDamageEnabled)
                     {
                         Transform player = GameEntryPoint.EventManager.playerManager.PlayerObject.transform;
                         float damageAngle = Vector3.SignedAngle(player.forward, collInfo.contacts[0].point - player.position, player.up);
 
+                        float MAX_CRASH_MAGNITUDE = Main.GetField<float, PlayerCollider>(
+                            __instance,
+                            "MAX_MAGNITUDE_CRASH",
+                            BindingFlags.Instance
+                        );
+
+                        float magnitudePercent = Mathf.InverseLerp(MIN_CRASH_MAGNITUDE, MAX_CRASH_MAGNITUDE, collInfo.relativeVelocity.magnitude);
+
                         if ((damageAngle > 0 ? damageAngle : -damageAngle) < radiatorAngle)
                         {
-                            float MAX_CRASH_MAGNITUDE = Main.GetField<float, PlayerCollider>(
-                                __instance,
-                                "MAX_MAGNITUDE_CRASH",
-                                BindingFlags.Instance
-                            );
-
-                            float magnitudePercent = Mathf.InverseLerp(
-                                MIN_CRASH_MAGNITUDE,
-                                MAX_CRASH_MAGNITUDE,
-                                collInfo.relativeVelocity.magnitude
-                            );
-
                             CarUtils.DamagePart(__instance, magnitudePercent, SystemToRepair.RADIATOR);
                             return;
                         }
 
                         // TODO : Damage suspensions
+                        for (int i = 0; i < wheelsAngles.Length; i++)
+                        {
+                            // TODO : Change how suspensions take damage
+                            // TODO : Add tilt if we hit 0 or 1
+                            float currentWheelAngle = wheelsAngles[i];
+                            //if (damageAngle <)
+                        }
                     }
 
                     // int probability = Random.Range(0, 100);
@@ -96,40 +101,28 @@ namespace BetterDamage
             return false;
         }
 
-        static void GenerateIfNeeded()
+        static void GenerateIfNeeded(PlayerCollider instance)
         {
-            bool needsRefresh = toWheelsAngles == null;
-
-            if (toWheelsAngles != null)
-            {
-                foreach (KeyValuePair<Wheel, float> pair in toWheelsAngles)
-                {
-                    if (pair.Key == null)
-                        needsRefresh = true;
-                }
-            }
-
-            if (radiatorAngle == 0)
-                needsRefresh = true;
-
-            if (!needsRefresh)
+            // makes sure we regenerate the angles when the car changes
+            if (player != null && player == instance && wheelsAngles != null)
                 return;
 
-            toWheelsAngles = new Dictionary<Wheel, float>();
+            wheelsAngles = new float[4];
 
             Wheel[] wheels = GameEntryPoint.EventManager.playerManager.axles.allWheels;
-            Transform player = GameEntryPoint.EventManager.playerManager.PlayerObject.transform;
+            Transform playerTr = GameEntryPoint.EventManager.playerManager.PlayerObject.transform;
 
             // we only care about the 4 first wheels (front and back)
             for (int i = 0; i < 4; i++)
             {
-                float wheelAngle = Vector3.SignedAngle(player.forward, wheels[i].transform.position - player.position, player.up);
-                toWheelsAngles.Add(wheels[i], wheelAngle);
+                float wheelAngle = Vector3.SignedAngle(playerTr.forward, wheels[i].transform.position - playerTr.position, playerTr.up);
+                wheelsAngles[i] = wheelAngle;
 
-                Main.Log("Wheel " + i + " angle :\nmin : " + (wheelAngle - WHEEL_CHECK_ANGLE) + "\nmax : " + (wheelAngle + WHEEL_CHECK_ANGLE));
+                Main.Log("Wheel " + i + " angle :\nmin : " + (wheelAngle - WHEEL_CHECK_ANGLE / 2) +
+                    "\nmax : " + (wheelAngle + WHEEL_CHECK_ANGLE / 2));
             }
 
-            radiatorAngle = toWheelsAngles[wheels[1]] - WHEEL_CHECK_ANGLE / 2;
+            radiatorAngle = wheelsAngles[1] - WHEEL_CHECK_ANGLE / 2;
             Main.Log("Radiator angle :\nmin : " + (-radiatorAngle) + "\nmax : " + radiatorAngle);
         }
     }
