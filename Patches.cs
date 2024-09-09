@@ -33,18 +33,21 @@ namespace BetterDamage
     // TODO : damage suspensions when bump (detect the direction of bump
     // TODO : damage turbo when overheat (detect when we overheat ? compare rev to forward speed / rev > ProjectForward(maxSpeed / 10))
 
-    // replaces the way car damage is decided
     [HarmonyPatch(typeof(PlayerCollider), "CheckForPunctureAndPerformanceDamage")]
-    static class PlayerCollider_CheckForPunctureAndPerformanceDamage_Patch
+    static class CarDamageManager
     {
+        //
+        // ANGLES FOR WHEEL DAMAGE ARE KINDA FUCKED (move them forward)
+        //
         const float WHEEL_CHECK_ANGLE = 10;
+        const float MAX_TILT_DAMAGE = 0.5f;
 
         public static float tiltToApply;
 
         static PlayerCollider player;
         // front 0 1 / back 2 3
         static float[] wheelsAngles;
-        // TODO : Turn this array into an array of min/max values
+        // TODO : Turn __instance array into an array of min/max values
         static float radiatorAngle;
 
         static bool Prefix(PlayerCollider __instance, Collision collInfo)
@@ -69,6 +72,7 @@ namespace BetterDamage
                     {
                         Transform player = GameEntryPoint.EventManager.playerManager.PlayerObject.transform;
                         float damageAngle = Vector3.SignedAngle(player.forward, collInfo.contacts[0].point - player.position, player.up);
+                        Main.Log("Damage angle : " + damageAngle);
 
                         float MAX_CRASH_MAGNITUDE = Main.GetField<float, PlayerCollider>(
                             __instance,
@@ -95,11 +99,14 @@ namespace BetterDamage
                                 // if we are on the front suspensions
                                 if (i <= 1)
                                 {
-                                    // TODO : Add tilt if we hit 0 or 1
-                                    // tiltToApply
+                                    // 0 = -1 / 1 = 1
+                                    float side = (i - 0.5f) * 2;
+                                    tiltToApply = magnitudePercent * MAX_TILT_DAMAGE * side;
+                                    Main.Log("New tilt damage : " + tiltToApply);
                                 }
 
                                 CarUtils.DamagePart(__instance, magnitudePercent, SystemToRepair.SUSPENSION);
+                                break;
                             }
                         }
                     }
@@ -120,6 +127,7 @@ namespace BetterDamage
             if (player != null && player == instance && wheelsAngles != null)
                 return;
 
+            player = instance;
             wheelsAngles = new float[4];
 
             Wheel[] wheels = GameEntryPoint.EventManager.playerManager.axles.allWheels;
@@ -140,9 +148,8 @@ namespace BetterDamage
         }
     }
 
-    // apply damage on landing (suspensions and tires)
     [HarmonyPatch(typeof(Arcader), "TryToStickLanding")]
-    static class Arcader_TryToStickLanding_Patch
+    static class LandingDamageManager
     {
         static PlayerCollider collider;
         static Coroutine waitRoutine;
@@ -216,5 +223,70 @@ namespace BetterDamage
         }
     }
 
-    // TODO : Override how SteeringPerformanceDamage.SetPerformance applies damage to the suspensions
+    [HarmonyPatch(typeof(SteeringPerfomanceDamage), nameof(SteeringPerfomanceDamage.SetPerformance))]
+    static class SteeringDamageManager
+    {
+        static float lastDamage;
+
+        static bool Prefix(SteeringPerfomanceDamage __instance)
+        {
+            if (!Main.enabled)
+                return true;
+
+            Main.Try(() =>
+            {
+                float tilt = Main.GetField<float, SteeringPerfomanceDamage>(__instance, "steeringAlignmentEffect", BindingFlags.Instance);
+
+                if (__instance.PerformanceCondition == PerformanceDamage.MAX_PERFORMANCE_CONDITION)
+                    Main.SetField<float, SteeringPerfomanceDamage>(__instance, "steeringAlignmentEffect", BindingFlags.Instance, 0);
+                else
+                {
+                    float currentDamage = PerformanceDamage.MAX_PERFORMANCE_CONDITION - __instance.PerformanceCondition;
+
+                    if (CarDamageManager.tiltToApply == 0 && lastDamage == currentDamage)
+                        return;
+
+                    // mapped -1 to 1
+                    float tiltPercent = lastDamage == 0 ? 0 : tilt * 20 / lastDamage;
+                    Main.Log("Current tilt percent : " + tiltPercent);
+                    tiltPercent = Mathf.Clamp(tiltPercent + CarDamageManager.tiltToApply, -1, 1);
+                    Main.Log("New tilt percent : " + tiltPercent);
+                    tilt = Mathf.Clamp(tiltPercent * currentDamage / 10, -0.1f, 0.1f) * 0.5f;
+
+                    Main.Log("Applied tilt : " + tilt);
+
+                    // aplly
+                    Main.SetField<float, SteeringPerfomanceDamage>(__instance, "steeringAlignmentEffect", BindingFlags.Instance, tilt);
+                    GameEntryPoint.EventManager.playerManager.PlayerObject.GetComponent<AxisCarController>().SteeringOutOfAlignmentEffect = tilt;
+
+                    CarDamageManager.tiltToApply = 0;
+                    lastDamage = currentDamage;
+                }
+            });
+
+            return false;
+        }
+    }
+
+    // TODO : Override Repair to fix suspension tilt
+    // /!\ check if this works /!\
+    [HarmonyPatch(typeof(PerformanceDamage), nameof(PerformanceDamage.Repair))]
+    static class SteeringRepairPatch
+    {
+        static void Postfix(PerformanceDamage __instance)
+        {
+            if (!Main.enabled || !(__instance is SteeringPerfomanceDamage))
+                return;
+
+            Main.Try(() =>
+            {
+                Main.SetField<float, SteeringPerfomanceDamage>(
+                    __instance as SteeringPerfomanceDamage,
+                    "steeringAlignmentEffect",
+                    BindingFlags.Instance,
+                    0
+                );
+            });
+        }
+    }
 }
