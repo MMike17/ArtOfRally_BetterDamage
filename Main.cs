@@ -69,6 +69,20 @@ namespace BetterDamage
         }
 
         /// <summary>BindingFlags.NonPrivate is implicit</summary>
+        public static void SetField<T, U>(U source, string fieldName, BindingFlags flags, object value)
+        {
+            FieldInfo info = source.GetType().GetField(fieldName, flags | BindingFlags.NonPublic);
+
+            if (info == null)
+            {
+                Error("Couldn't find field info for field \"" + fieldName + "\" in type \"" + source.GetType() + "\"");
+                return;
+            }
+
+            info.SetValue(source, value);
+        }
+
+        /// <summary>BindingFlags.NonPrivate is implicit</summary>
         public static void InvokeMethod<T>(T source, string methodName, BindingFlags flags, object[] args)
         {
             MethodInfo info = source.GetType().GetMethod(methodName, flags | BindingFlags.NonPublic);
