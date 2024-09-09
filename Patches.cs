@@ -42,23 +42,10 @@ namespace BetterDamage
         static Dictionary<Wheel, float> toWheelsAngles;
         static float radiatorAngle;
 
-        static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> instructions)
-        {
-            // skip execution
-            if (Main.enabled)
-                yield break;
-            else
-            {
-                // execute normal code
-                foreach (CodeInstruction instruction in instructions)
-                    yield return instruction;
-            }
-        }
-
-        static void Prefix(PlayerCollider __instance, Collision collInfo)
+        static bool Prefix(PlayerCollider __instance, Collision collInfo)
         {
             if (!Main.enabled)
-                return;
+                return true;
 
             Main.Try(() =>
             {
@@ -71,8 +58,7 @@ namespace BetterDamage
 
                 if (GameModeManager.GameMode != GameModeManager.GAME_MODES.FREEROAM && collInfo.relativeVelocity.magnitude > MIN_CRASH_MAGNITUDE)
                 {
-                    if (toWheelsAngles == null || toWheelsAngles.ContainsKey(null) || radiatorAngle == 0)
-                        GenerateWheelAngles();
+                    GenerateIfNeeded();
 
                     if (isPerformanceDamageEnabled)
                     {
@@ -106,19 +92,45 @@ namespace BetterDamage
                     // TODO : Do damage headlights check (check if we collided in the direction of headlights)
                 }
             });
+
+            return false;
         }
 
-        static void GenerateWheelAngles()
+        static void GenerateIfNeeded()
         {
+            bool needsRefresh = toWheelsAngles == null;
+
+            if (toWheelsAngles != null)
+            {
+                foreach (KeyValuePair<Wheel, float> pair in toWheelsAngles)
+                {
+                    if (pair.Key == null)
+                        needsRefresh = true;
+                }
+            }
+
+            if (radiatorAngle == 0)
+                needsRefresh = true;
+
+            if (!needsRefresh)
+                return;
+
             toWheelsAngles = new Dictionary<Wheel, float>();
+
             Wheel[] wheels = GameEntryPoint.EventManager.playerManager.axles.allWheels;
             Transform player = GameEntryPoint.EventManager.playerManager.PlayerObject.transform;
 
             // we only care about the 4 first wheels (front and back)
             for (int i = 0; i < 4; i++)
-                toWheelsAngles.Add(wheels[i], Vector3.SignedAngle(player.forward, wheels[i].transform.position - player.position, player.up));
+            {
+                float wheelAngle = Vector3.SignedAngle(player.forward, wheels[i].transform.position - player.position, player.up);
+                toWheelsAngles.Add(wheels[i], wheelAngle);
+
+                Main.Log("Wheel " + i + " angle :\nmin : " + (wheelAngle - WHEEL_CHECK_ANGLE) + "\nmax : " + (wheelAngle + WHEEL_CHECK_ANGLE));
+            }
 
             radiatorAngle = toWheelsAngles[wheels[1]] - WHEEL_CHECK_ANGLE / 2;
+            Main.Log("Radiator angle :\nmin : " + (-radiatorAngle) + "\nmax : " + radiatorAngle);
         }
     }
 
