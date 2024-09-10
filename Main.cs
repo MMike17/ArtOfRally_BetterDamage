@@ -116,6 +116,7 @@ namespace BetterDamage
             {
                 markerMat = new Material(Shader.Find("Standard"));
                 markerMat.color = Color.red;
+                markerMat.SetColor("_EmissionColor", Color.red);
             }
 
             GameObject marker = GameObject.CreatePrimitive(PrimitiveType.Sphere);
