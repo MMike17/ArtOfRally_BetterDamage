@@ -26,16 +26,22 @@ namespace BetterDamage
 
         [Draw(DrawType.Slider, Min = 0, Max = 100, VisibleOn = "enableLandingDamage|true")]
         public float landingPunctureThreshold = 90;
-        [Draw(DrawType.Slider, Min = 0, Max = 10, VisibleOn = "enableLandingDamage|true", Precision = 1)]
+        [Draw(DrawType.Slider, Min = 0, Max = 5, VisibleOn = "enableLandingDamage|true", Precision = 1)]
         public float landingPunctureProbability = 0.5f;
 
         [Header("Crash")]
         [Draw(DrawType.Slider, Min = 0, Max = 100)]
         public float crashPunctureThreshold = 90;
-        [Draw(DrawType.Slider, Min = 0, Max = 10, Precision = 1)]
+        [Draw(DrawType.Slider, Min = 0, Max = 5, Precision = 1)]
         public float crashPunctureProbability = 0.5f;
         [Draw(DrawType.Slider, Min = 0, Max = 50, Precision = 1)]
         public float crashHeadlightProbability = 8;
+
+        [Header("Drift")]
+        [Draw(DrawType.Toggle)]
+        public bool enableDriftDamage;
+        [Draw(DrawType.Slider, Min = 0, Max = 10, VisibleOn = "enableDriftDamage|true", Precision = 1)]
+        public float driftPunctureProbability = 1f;
 
         public override void Save(ModEntry modEntry)
         {
