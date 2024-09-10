@@ -37,7 +37,7 @@ namespace BetterDamage
     static class CarDamageManager
     {
         const float WHEEL_WIDTH = 0.7f;
-        const float WHEEL_FRONT_PERCENT = 0.4f;
+        const float WHEEL_FRONT_PERCENT = 0.45f;
         const float MAX_TILT_DAMAGE = 0.5f;
 
         public static float tiltToApply;
@@ -287,17 +287,19 @@ namespace BetterDamage
 
             return false;
         }
+
+        public static void Reset() => lastDamage = 0;
     }
 
-    // TODO : Override Repair to fix suspension tilt
-    // /!\ check if this works /!\
     [HarmonyPatch(typeof(PerformanceDamage), nameof(PerformanceDamage.Repair))]
     static class SteeringRepairPatch
     {
-        static void Postfix(PerformanceDamage __instance)
+        static void Prefix(PerformanceDamage __instance)
         {
             if (!Main.enabled || !(__instance is SteeringPerfomanceDamage))
                 return;
+
+            Main.Log("Detected repair part");
 
             Main.Try(() =>
             {
@@ -307,6 +309,8 @@ namespace BetterDamage
                     BindingFlags.Instance,
                     0
                 );
+
+                SteeringDamageManager.Reset();
             });
         }
     }
