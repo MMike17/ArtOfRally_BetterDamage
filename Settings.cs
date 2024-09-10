@@ -9,7 +9,6 @@ namespace BetterDamage
     {
         // [Draw(DrawType.)]
 
-        // TODO : Add this to ModBase repo
         [Header("Debug")]
         [Draw(DrawType.Toggle)]
         public bool showMarkers;
@@ -49,8 +48,6 @@ namespace BetterDamage
         public void OnChange()
         {
             InputValidation();
-
-            // TODO : Add this to ModBase repo
             Main.SetMarkers(showMarkers);
         }
 

@@ -74,7 +74,6 @@ namespace BetterDamage
             return (T)info.GetValue(source);
         }
 
-        // TODO : Add this to ModBase repo
         /// <summary>BindingFlags.NonPrivate is implicit</summary>
         public static void SetField<T, U>(U source, string fieldName, BindingFlags flags, object value)
         {
@@ -103,7 +102,6 @@ namespace BetterDamage
             info.Invoke(source, args);
         }
 
-        // TODO : Add this to ModBase repo
         public static void SetMarkers(bool state)
         {
             CleanMarkerList();
