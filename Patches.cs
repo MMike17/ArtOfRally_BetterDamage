@@ -36,19 +36,15 @@ namespace BetterDamage
     [HarmonyPatch(typeof(PlayerCollider), "CheckForPunctureAndPerformanceDamage")]
     static class CarDamageManager
     {
-        //
-        // ANGLES FOR WHEEL DAMAGE ARE KINDA FUCKED (move them forward)
-        //
-        const float WHEEL_CHECK_ANGLE = 10;
+        const float WHEEL_WIDTH = 0.7f;
+        const float WHEEL_FRONT_PERCENT = 0.4f;
         const float MAX_TILT_DAMAGE = 0.5f;
 
         public static float tiltToApply;
 
         static PlayerCollider player;
-        // front 0 1 / back 2 3
-        static float[] wheelsAngles;
-        // TODO : Turn __instance array into an array of min/max values
-        static float radiatorAngle;
+        static Vector2[] wheelsSlice; // front 0 1 / back 2 3
+        static Vector2 radiatorSlice;
 
         static bool Prefix(PlayerCollider __instance, Collision collInfo)
         {
@@ -82,19 +78,17 @@ namespace BetterDamage
 
                         float magnitudePercent = Mathf.InverseLerp(MIN_CRASH_MAGNITUDE, MAX_CRASH_MAGNITUDE, collInfo.relativeVelocity.magnitude);
 
-                        if ((damageAngle > 0 ? damageAngle : -damageAngle) < radiatorAngle)
+                        if (damageAngle > radiatorSlice.x && damageAngle < radiatorSlice.y)
                         {
                             CarUtils.DamagePart(__instance, magnitudePercent, SystemToRepair.RADIATOR);
                             return;
                         }
 
-                        for (int i = 0; i < wheelsAngles.Length; i++)
+                        for (int i = 0; i < wheelsSlice.Length; i++)
                         {
-                            float angle = wheelsAngles[i];
-                            float min = angle - WHEEL_CHECK_ANGLE / 2;
-                            float max = min + WHEEL_CHECK_ANGLE;
+                            Vector2 slice = wheelsSlice[i];
 
-                            if (damageAngle > min && damageAngle < max)
+                            if (damageAngle > Mathf.Min(slice.x, slice.y) && damageAngle < Mathf.Max(slice.x, slice.y))
                             {
                                 // if we are on the front suspensions
                                 if (i <= 1)
@@ -124,27 +118,54 @@ namespace BetterDamage
         static void GenerateIfNeeded(PlayerCollider instance)
         {
             // makes sure we regenerate the angles when the car changes
-            if (player != null && player == instance && wheelsAngles != null)
+            if (player != null && player == instance && wheelsSlice != null)
                 return;
 
             player = instance;
-            wheelsAngles = new float[4];
+            wheelsSlice = new Vector2[4];
 
             Wheel[] wheels = GameEntryPoint.EventManager.playerManager.axles.allWheels;
             Transform playerTr = GameEntryPoint.EventManager.playerManager.PlayerObject.transform;
 
+            Vector3 frontCenterPoint = Vector3.Lerp(wheels[0].transform.position, wheels[1].transform.position, 0.5f);
+            Vector3 backCenterPoint = Vector3.Lerp(wheels[2].transform.position, wheels[3].transform.position, 0.5f);
+            float wheelDistance = (wheels[1].transform.position - frontCenterPoint).magnitude;
+
             // we only care about the 4 first wheels (front and back)
             for (int i = 0; i < 4; i++)
             {
-                float wheelAngle = Vector3.SignedAngle(playerTr.forward, wheels[i].transform.position - playerTr.position, playerTr.up);
-                wheelsAngles[i] = wheelAngle;
+                int side = wheels[i].transform.localPosition.x > 0 ? 1 : -1;
+                float pointDistance = side * wheelDistance * (1 - WHEEL_FRONT_PERCENT);
+                Vector3 frontPos;
+                Vector3 backPos;
 
-                Main.Log("Wheel " + i + " angle :\nmin : " + (wheelAngle - WHEEL_CHECK_ANGLE / 2) +
-                    "\nmax : " + (wheelAngle + WHEEL_CHECK_ANGLE / 2));
+                if (i < 2)
+                {
+                    frontPos = frontCenterPoint + playerTr.right * pointDistance;
+                    backPos = wheels[i].transform.position - playerTr.forward * WHEEL_WIDTH / 2;
+
+                    Main.AddMarker(playerTr, frontPos + playerTr.forward * 0.9f, 0.1f);
+                    Main.AddMarker(playerTr, backPos + playerTr.right * side * 0.1f, 0.1f);
+                }
+                else
+                {
+                    frontPos = wheels[i].transform.position + playerTr.forward * WHEEL_WIDTH / 2;
+                    backPos = backCenterPoint + playerTr.right * pointDistance;
+
+                    Main.AddMarker(playerTr, frontPos + playerTr.right * side * 0.1f, 0.1f);
+                    Main.AddMarker(playerTr, backPos - playerTr.forward * 1f, 0.1f);
+                }
+
+                wheelsSlice[i] = new Vector2(
+                    Vector3.SignedAngle(playerTr.forward, frontPos - playerTr.position, playerTr.up),
+                    Vector3.SignedAngle(playerTr.forward, backPos - playerTr.position, playerTr.up)
+                );
+
+                Main.Log("Wheel " + i + " angle :\nmin : " + wheelsSlice[i].x + "\nmax : " + wheelsSlice[i].y);
             }
 
-            radiatorAngle = wheelsAngles[1] - WHEEL_CHECK_ANGLE / 2;
-            Main.Log("Radiator angle :\nmin : " + (-radiatorAngle) + "\nmax : " + radiatorAngle);
+            radiatorSlice = new Vector2(wheelsSlice[0].x, wheelsSlice[1].x);
+            Main.Log("Radiator angle :\nmin : " + radiatorSlice.x + "\nmax : " + radiatorSlice.y);
         }
     }
 
