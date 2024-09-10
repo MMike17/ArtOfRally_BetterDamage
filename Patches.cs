@@ -54,41 +54,45 @@ namespace BetterDamage
             Main.Try(() =>
             {
                 float MIN_CRASH_MAGNITUDE = Main.GetField<float, PlayerCollider>(__instance, "MIN_MAGNITUDE_CRASH", BindingFlags.Instance);
-                bool isPerformanceDamageEnabled = Main.GetField<bool, PlayerCollider>(
-                    __instance,
-                    "isPerformanceDamageEnabled",
-                    BindingFlags.Instance
-                );
 
                 if (GameModeManager.GameMode != GameModeManager.GAME_MODES.FREEROAM && collInfo.relativeVelocity.magnitude > MIN_CRASH_MAGNITUDE)
                 {
                     GenerateIfNeeded(__instance);
 
-                    if (isPerformanceDamageEnabled)
+                    bool isPerformanceDamageEnabled = Main.GetField<bool, PlayerCollider>(
+                        __instance,
+                        "isPerformanceDamageEnabled",
+                        BindingFlags.Instance
+                    );
+
+                    Transform player = GameEntryPoint.EventManager.playerManager.PlayerObject.transform;
+                    float damageAngle = Vector3.SignedAngle(player.forward, collInfo.contacts[0].point - player.position, player.up);
+
+                    Main.Log("Damage angle : " + damageAngle);
+
+                    float MAX_CRASH_MAGNITUDE = Main.GetField<float, PlayerCollider>(__instance, "MAX_MAGNITUDE_CRASH", BindingFlags.Instance);
+                    float magnitudePercent = Mathf.InverseLerp(MIN_CRASH_MAGNITUDE, MAX_CRASH_MAGNITUDE, collInfo.relativeVelocity.magnitude);
+
+                    float probability = Random.Range(0f, 100f);
+
+                    if (damageAngle > radiatorSlice.x && damageAngle < radiatorSlice.y)
                     {
-                        Transform player = GameEntryPoint.EventManager.playerManager.PlayerObject.transform;
-                        float damageAngle = Vector3.SignedAngle(player.forward, collInfo.contacts[0].point - player.position, player.up);
-                        Main.Log("Damage angle : " + damageAngle);
-
-                        float MAX_CRASH_MAGNITUDE = Main.GetField<float, PlayerCollider>(
-                            __instance,
-                            "MAX_MAGNITUDE_CRASH",
-                            BindingFlags.Instance
-                        );
-
-                        float magnitudePercent = Mathf.InverseLerp(MIN_CRASH_MAGNITUDE, MAX_CRASH_MAGNITUDE, collInfo.relativeVelocity.magnitude);
-
-                        if (damageAngle > radiatorSlice.x && damageAngle < radiatorSlice.y)
-                        {
+                        if (isPerformanceDamageEnabled)
                             CarUtils.DamagePart(__instance, magnitudePercent, SystemToRepair.RADIATOR);
-                            return;
-                        }
 
-                        for (int i = 0; i < wheelsSlice.Length; i++)
+                        if (probability < Main.settings.crashHeadlightProbability)
+                            GameEntryPoint.EventManager.playerManager.headlightManager.ReduceHeadlightStrength();
+
+                        return;
+                    }
+
+                    for (int i = 0; i < wheelsSlice.Length; i++)
+                    {
+                        Vector2 slice = wheelsSlice[i];
+
+                        if (damageAngle > Mathf.Min(slice.x, slice.y) && damageAngle < Mathf.Max(slice.x, slice.y))
                         {
-                            Vector2 slice = wheelsSlice[i];
-
-                            if (damageAngle > Mathf.Min(slice.x, slice.y) && damageAngle < Mathf.Max(slice.x, slice.y))
+                            if (isPerformanceDamageEnabled)
                             {
                                 // if we are on the front suspensions
                                 if (i <= 1)
@@ -102,13 +106,14 @@ namespace BetterDamage
                                 CarUtils.DamagePart(__instance, magnitudePercent, SystemToRepair.SUSPENSION);
                                 break;
                             }
+
+                            if (probability < Main.settings.crashPunctureProbability)
+                            {
+                                CarUtils.PunctureTire(__instance, GameEntryPoint.EventManager.playerManager.axles.allWheels[i]);
+                                break;
+                            }
                         }
                     }
-
-                    // int probability = Random.Range(0, 100);
-
-                    // TODO : Do puncture check (check if we collided in the direction of wheels)
-                    // TODO : Do damage headlights check (check if we collided in the direction of headlights)
                 }
             });
 
@@ -217,7 +222,7 @@ namespace BetterDamage
                 );
 
                 if (magnitudePercent * 100 >= Main.settings.landingPunctureThreshold &&
-                    Random.Range(0, 100) < Main.settings.landingPunctureProbability)
+                    Random.Range(0f, 100f) < Main.settings.landingPunctureProbability)
                 {
                     List<Wheel> availableWheels = new List<Wheel>();
 

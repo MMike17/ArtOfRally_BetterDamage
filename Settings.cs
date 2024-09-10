@@ -35,6 +35,8 @@ namespace BetterDamage
         public float crashPunctureThreshold = 90;
         [Draw(DrawType.Slider, Min = 0, Max = 100, Precision = 1)]
         public float crashPunctureProbability = 0.5f;
+        [Draw(DrawType.Slider, Min = 0, Max = 100, Precision = 1)]
+        public float crashHeadlightProbability = 8;
 
         // TODO : Add headlight damage probability on crash
 
