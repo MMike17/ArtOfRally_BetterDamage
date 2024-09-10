@@ -125,6 +125,7 @@ namespace BetterDamage
             marker.transform.position = position;
             marker.transform.localScale = Vector3.one * size;
 
+            marker.SetActive(settings.showMarkers);
             markers.Add(marker);
         }
 
