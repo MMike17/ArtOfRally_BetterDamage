@@ -9,6 +9,10 @@ namespace BetterDamage
     {
         // [Draw(DrawType.)]
 
+        [Header("Debug")]
+        [Draw(DrawType.Toggle)]
+        public bool showMarkers;
+
         [Header("Landing")]
         [Draw(DrawType.Toggle)]
         public bool enableLandingDamage;
@@ -42,6 +46,7 @@ namespace BetterDamage
         public void OnChange()
         {
             InputValidation();
+            Main.SetMarkers(showMarkers);
         }
 
         void InputValidation()
