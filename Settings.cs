@@ -46,8 +46,8 @@ namespace BetterDamage
         [Header("Overheat")]
         [Draw(DrawType.Toggle)]
         public bool enableOverheatDamage = true;
-        [Draw(DrawType.Slider, Min = 13, Max = 30, VisibleOn = "enableOverheatDamage|true", Precision = 1)]
-        public float overheatRPMThresholdPercent = 15;
+        [Draw(DrawType.Slider, Min = 75, Max = 85, VisibleOn = "enableOverheatDamage|true", Precision = 0)]
+        public float overheatRPMThresholdPercent = 85;
         [Draw(DrawType.Slider, Min = 0.1f, Max = 1.5f, VisibleOn = "enableOverheatDamage|true", Precision = 1)]
         public float overheatCooldownSpeedMult = 0.7f;
 
