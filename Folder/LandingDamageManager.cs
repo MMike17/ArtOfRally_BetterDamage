@@ -1,6 +1,5 @@
 ﻿using HarmonyLib;
 using System.Collections;
-using System.Collections.Generic;
 using System.Reflection;
 using UnityEngine;
 
@@ -59,21 +58,18 @@ namespace BetterDamage
                 if (magnitudePercent * 100 >= Main.settings.landingPunctureThreshold &&
                     Random.Range(0f, 100f) < Main.settings.landingPunctureProbability)
                 {
-                    List<Wheel> availableWheels = new List<Wheel>();
+                    Wheel[] wheels = GameEntryPoint.EventManager.playerManager.axles.allWheels;
 
-                    foreach (Wheel wheel in GameEntryPoint.EventManager.playerManager.axles.allWheels)
+                    foreach (Wheel wheel in wheels)
                     {
-                        if (!wheel.tirePuncture)
-                            availableWheels.Add(wheel);
+                        if (wheel.tirePuncture)
+                        {
+                            Main.Log("A tire is already punctured. Aborting.");
+                            yield break;
+                        }
                     }
 
-                    if (availableWheels.Count == 0)
-                    {
-                        Main.Log("All wheels are punctured. Aborting.");
-                        yield break;
-                    }
-
-                    CarUtils.PunctureTire(collider, availableWheels[Random.Range(0, availableWheels.Count)]);
+                    CarUtils.PunctureTire(collider, wheels[Random.Range(0, wheels.Length)]);
                 }
                 else // damage suspension (we don't damage suspension and puncture tire at the same time)
                 {
