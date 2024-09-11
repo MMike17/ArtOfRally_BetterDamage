@@ -10,11 +10,10 @@ namespace BetterDamage
     [HarmonyPatch(typeof(Drivetrain))]
     static class OverheatManager
     {
-        const float REFERENCE_TEMPERATURE = 15f;
-        const float MAX_OVERHEAT = 2f;
+        public const float MAX_OVERHEAT = 2f; //  debug
         const float ENGINE_DAMAGE_RATE = 0.03f;
 
-        static List<(int, int, float)> mapHeatMultipliers = new List<(int, int, float)>()
+        static List<(int min, int max, float temp)> mapHeatMultipliers = new List<(int, int, float)>()
         {
             (9, 14, 3.24f), // Finland
             (15, 20, 22.6f), // Sardinia
@@ -27,8 +26,8 @@ namespace BetterDamage
 
         static PlayerCollider player;
         static float overheatRPMThreshold;
-        public static float overheatCount;
-        static float mapMultiplier;
+        public static float overheatCount; //  debug
+        static float rpmBalance;
 
         [HarmonyPatch("FixedUpdate")]
         static void Postfix(Drivetrain __instance)
@@ -40,24 +39,15 @@ namespace BetterDamage
             {
                 GenerateIfNeeded(__instance);
 
-                // TODO : Add map-based overheat and cooldown speed
                 if (__instance.rpm >= overheatRPMThreshold)
-                {
                     overheatCount = Mathf.MoveTowards(overheatCount, MAX_OVERHEAT, Time.fixedDeltaTime);
-                }
                 else
                 {
                     // progressive cooldown
                     float rpmPercent = 1;
 
-                    if (__instance.rpm >= Main.settings.overheatRPMBalancePercent)
-                    {
-                        rpmPercent = Mathf.InverseLerp(
-                            Main.settings.overheatRPMThresholdPercent,
-                            Main.settings.overheatRPMBalancePercent,
-                            __instance.rpm
-                        );
-                    }
+                    if (__instance.rpm >= rpmBalance)
+                        rpmPercent = Mathf.InverseLerp(Main.settings.overheatRPMThresholdPercent, rpmBalance, __instance.rpm);
 
                     // apply radiator condition
                     float radiatorCondition = GameEntryPoint.EventManager.playerManager.performanceDamageManager
@@ -87,8 +77,17 @@ namespace BetterDamage
                 overheatCount = 0;
 
                 int currentScene = SceneManager.GetActiveScene().buildIndex;
-                var map = mapHeatMultipliers.Find(item => currentScene >= item.Item1 || currentScene <= item.Item2);
-                mapMultiplier = map.Item3 / REFERENCE_TEMPERATURE;
+                float currentTemp = mapHeatMultipliers.Find(item => currentScene >= item.min || currentScene <= item.max).temp;
+
+                // min = index 3 / max = index 6
+                float mapHeatPercent = Mathf.InverseLerp(mapHeatMultipliers[3].temp, mapHeatMultipliers[6].temp, currentTemp);
+                float thresholdDistance = (Main.settings.overheatRPMThresholdPercent - Main.settings.overheatRPMBalancePercent) / 2;
+
+                rpmBalance = Mathf.Lerp(
+                    Main.settings.overheatRPMBalancePercent + thresholdDistance, // cold 
+                    Main.settings.overheatRPMBalancePercent - thresholdDistance, // hot
+                    mapHeatPercent
+                );
 
                 Refresh();
             }
