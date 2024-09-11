@@ -9,11 +9,11 @@ namespace BetterDamage
     static class OverheatManager
     {
         const float MAX_OVERHEAT = 1.5f;
-        const float ENGINE_DAMAGE_RATE = 0.02f;
+        const float ENGINE_DAMAGE_RATE = 0.03f;
 
         static PlayerCollider player;
         static float overheatRPMThreshold;
-        static float overheatCount;
+        public static float overheatCount;
 
         [HarmonyPatch("FixedUpdate")]
         static void Postfix(Drivetrain __instance)
@@ -33,9 +33,9 @@ namespace BetterDamage
                 {
                     float radiatorCondition = GameEntryPoint.EventManager.playerManager.performanceDamageManager
                         .GetConditionOfPart(SystemToRepair.RADIATOR);
+                    float cooldownSpeed = Main.settings.overheatCooldownSpeedMult * (0.2f + radiatorCondition) * Time.fixedDeltaTime;
 
-                    overheatCount = Mathf.MoveTowards(overheatCount, 0,
-                        Time.fixedDeltaTime * Main.settings.overheatCooldownSpeedMult * (0.1f + radiatorCondition));
+                    overheatCount = Mathf.MoveTowards(overheatCount, 0, cooldownSpeed);
                 }
 
                 if (overheatCount >= MAX_OVERHEAT)
@@ -61,8 +61,7 @@ namespace BetterDamage
             if (player == null)
                 return;
 
-            overheatRPMThreshold = GameEntryPoint.EventManager.playerManager.drivetrain.maxRPM *
-                (100 - Main.settings.overheatRPMThresholdPercent) / 100;
+            overheatRPMThreshold = GameEntryPoint.EventManager.playerManager.drivetrain.maxRPM * Main.settings.overheatRPMThresholdPercent / 100;
         }
 
         // __ Overheat __
