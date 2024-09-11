@@ -11,6 +11,11 @@ using Random = UnityEngine.Random;
 
 namespace BetterDamage
 {
+    // /!\ TODO : DISABLE DAMAGES WHEN IN REPLAY MODE /!\
+
+    // TODO : Disable the "wear and tear" at the end of a stage (except for body ?)
+    // TODO : Add body damage by default
+
     // Patch model
     // [HarmonyPatch(typeof(), nameof())]
     // [HarmonyPatch(typeof(), MethodType.)]
@@ -29,7 +34,7 @@ namespace BetterDamage
 
     // TARGETS :
 
-    // TODO : damage gearbox when you shift down and over rev / shift R when going forward / shift 1 when going back(complex to detect)
-    // TODO : damage engine whe you over rev (detect over rev)
+    // TODO : damage gearbox when you shift down and over rev
+    // TODO : damage gearbox when you hit the back of the car
     // TODO : damage turbo when overheat (detect when we overheat ? compare rev to forward speed / rev > ProjectForward(maxSpeed / 10))
 }
