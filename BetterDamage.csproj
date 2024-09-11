@@ -87,10 +87,14 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Folder\CarDamageManager.cs" />
     <Compile Include="CarUtils.cs" />
+    <Compile Include="Folder\DriftManager.cs" />
+    <Compile Include="Folder\LandingDamageManager.cs" />
     <Compile Include="Main.cs" />
     <Compile Include="Settings.cs" />
-    <Compile Include="Patches.cs" />
+    <Compile Include="Folder\Patches.cs" />
+    <Compile Include="Folder\SteeringDamageManager.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Target Name="CopyInfo" AfterTargets="BeforeBuild">
