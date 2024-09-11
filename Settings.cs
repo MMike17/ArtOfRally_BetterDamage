@@ -11,26 +11,26 @@ namespace BetterDamage
 
         [Header("Debug")]
         [Draw(DrawType.Toggle)]
-        public bool showMarkers;
+        public bool showMarkers = false;
 
         [Header("Landing")]
         [Draw(DrawType.Toggle)]
-        public bool enableLandingDamage;
-
+        public bool enableLandingDamage = true;
+        [Space]
         [Draw(DrawType.Slider, Min = 3, Max = 8, VisibleOn = "enableLandingDamage|true", Precision = 1)]
         public float minLandingThreshold = 5;
         [Draw(DrawType.Slider, Min = 5, Max = 20, VisibleOn = "enableLandingDamage|true", Precision = 1)]
         public float maxLandingThreshold = 13;
-        [Draw(DrawType.Slider, Min = 0, Max = 2, VisibleOn = "enableLandingDamage|true")]
+        [Draw(DrawType.Slider, Min = 0, Max = 2, VisibleOn = "enableLandingDamage|true", Precision = 0)]
         public float landingDamageMultiplier = 1;
-
-        [Draw(DrawType.Slider, Min = 0, Max = 100, VisibleOn = "enableLandingDamage|true")]
+        [Space]
+        [Draw(DrawType.Slider, Min = 0, Max = 100, VisibleOn = "enableLandingDamage|true", Precision = 0)]
         public float landingPunctureThreshold = 90;
         [Draw(DrawType.Slider, Min = 0, Max = 5, VisibleOn = "enableLandingDamage|true", Precision = 1)]
         public float landingPunctureProbability = 0.5f;
 
         [Header("Crash")]
-        [Draw(DrawType.Slider, Min = 0, Max = 100)]
+        [Draw(DrawType.Slider, Min = 0, Max = 100, Precision = 0)]
         public float crashPunctureThreshold = 90;
         [Draw(DrawType.Slider, Min = 0, Max = 5, Precision = 1)]
         public float crashPunctureProbability = 0.5f;
@@ -39,9 +39,15 @@ namespace BetterDamage
 
         [Header("Drift")]
         [Draw(DrawType.Toggle)]
-        public bool enableDriftDamage;
+        public bool enableDriftDamage = true;
         [Draw(DrawType.Slider, Min = 0, Max = 10, VisibleOn = "enableDriftDamage|true", Precision = 1)]
         public float driftPunctureProbability = 1f;
+
+        [Header("Overheat")]
+        [Draw(DrawType.Toggle)]
+        public bool enableOverheatDamage = true;
+        [Draw(DrawType.Slider, Min = 0, Max = 100, VisibleOn = "enableOverheatDamage|true", Precision = 1)]
+        public float overheatRPMThresholdPercent = 10;
 
         public override void Save(ModEntry modEntry)
         {
@@ -53,6 +59,7 @@ namespace BetterDamage
         {
             InputValidation();
             Main.SetMarkers(showMarkers);
+            OverheatManager.Refresh();
         }
 
         void InputValidation()
