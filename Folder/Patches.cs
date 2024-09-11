@@ -32,9 +32,4 @@ namespace BetterDamage
     // TODO : damage gearbox when you shift down and over rev / shift R when going forward / shift 1 when going back(complex to detect)
     // TODO : damage engine whe you over rev (detect over rev)
     // TODO : damage turbo when overheat (detect when we overheat ? compare rev to forward speed / rev > ProjectForward(maxSpeed / 10))
-
-    // __ Overheat __
-    // currentRev > ProjectForward(maxCarSpeed / 10) /*find the right ratio*/
-    // add to overheat counter => goes up when overheat / goes down on update (get cooling speed)
-    // reduce cooling speed depending on radiator state
 }

@@ -91,6 +91,7 @@
     <Compile Include="CarUtils.cs" />
     <Compile Include="Folder\DriftManager.cs" />
     <Compile Include="Folder\LandingDamageManager.cs" />
+    <Compile Include="Folder\OverheatManager.cs" />
     <Compile Include="Main.cs" />
     <Compile Include="Settings.cs" />
     <Compile Include="Folder\Patches.cs" />
