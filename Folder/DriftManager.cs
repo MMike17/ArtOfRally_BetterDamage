@@ -19,7 +19,7 @@ namespace BetterDamage
 
         static void Postfix(Wheel __instance)
         {
-            if (!Main.settings.enableDriftDamage)
+            if (!Main.enabled || !Main.settings.enableDriftDamage)
                 return;
 
             Main.Try(() =>
@@ -101,6 +101,9 @@ namespace BetterDamage
     {
         static void Postfix()
         {
+            if (!Main.enabled || !Main.settings.enableDriftDamage)
+                return;
+
             Main.Try(() => DriftManager.Reset());
         }
     }
@@ -110,6 +113,9 @@ namespace BetterDamage
     {
         static void Postfix()
         {
+            if (!Main.enabled || !Main.settings.enableDriftDamage)
+                return;
+
             Main.Try(() => DriftManager.Reset());
         }
     }
