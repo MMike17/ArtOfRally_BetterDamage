@@ -10,8 +10,11 @@ namespace BetterDamage
     [HarmonyPatch(typeof(Drivetrain))]
     static class OverheatManager
     {
-        public const float MAX_OVERHEAT = 2f; //  debug
-        const float ENGINE_DAMAGE_RATE = 0.03f;
+        const float MAX_OVERHEAT = 2f;
+        const float ENGINE_DAMAGE_RATE = 0.02f;
+        const int MIN_TURBO_SPEED = 10; // 20 km/h
+        const int MAX_TURBO_SPEED = 50; // 100 km/h
+        const float TURBO_DAMAGE_RATE = 0.1f;
 
         static List<(int min, int max, float temp)> mapHeatMultipliers = new List<(int, int, float)>()
         {
@@ -26,7 +29,7 @@ namespace BetterDamage
 
         static PlayerCollider player;
         static float overheatRPMThreshold;
-        public static float overheatCount; //  debug
+        static float overheatCount;
         static float rpmBalance;
 
         [HarmonyPatch("FixedUpdate")]
@@ -61,9 +64,22 @@ namespace BetterDamage
                 {
                     CarUtils.DamagePart(player, ENGINE_DAMAGE_RATE * Time.fixedDeltaTime, SystemToRepair.ENGINE);
 
-                    if (overheatCount == MAX_OVERHEAT)
+                    if (CarManager.GetCarStatsForCar(GameModeManager.GetSeasonDataCurrentGameMode().SelectedCar).Aspiration !=
+                        CarSpecs.EngineAspiration.NATURAL)
                     {
-                        // TODO : Damage turbo here
+                        float forwardSpeed = Vector3.Project(
+                            GameEntryPoint.EventManager.playerManager.playerRigidBody.velocity,
+                            player.transform.forward
+                        ).magnitude;
+
+                        float rpmPercent = Mathf.InverseLerp(overheatRPMThreshold, __instance.maxRPM, __instance.rpm);
+                        float speedPercent = Mathf.InverseLerp(MIN_TURBO_SPEED, MAX_TURBO_SPEED, forwardSpeed);
+
+                        if (speedPercent < rpmPercent)
+                        {
+                            float damagePercent = rpmPercent - speedPercent;
+                            CarUtils.DamagePart(player, damagePercent * TURBO_DAMAGE_RATE * Time.fixedDeltaTime, SystemToRepair.TURBO);
+                        }
                     }
                 }
             });
@@ -76,19 +92,6 @@ namespace BetterDamage
                 player = GameEntryPoint.EventManager.playerManager.PlayerObject.GetComponent<PlayerCollider>();
                 overheatCount = 0;
 
-                int currentScene = SceneManager.GetActiveScene().buildIndex;
-                float currentTemp = mapHeatMultipliers.Find(item => currentScene >= item.min || currentScene <= item.max).temp;
-
-                // min = index 3 / max = index 6
-                float mapHeatPercent = Mathf.InverseLerp(mapHeatMultipliers[3].temp, mapHeatMultipliers[6].temp, currentTemp);
-                float thresholdDistance = (Main.settings.overheatRPMThresholdPercent - Main.settings.overheatRPMBalancePercent) / 2;
-
-                rpmBalance = Mathf.Lerp(
-                    Main.settings.overheatRPMBalancePercent + thresholdDistance, // cold 
-                    Main.settings.overheatRPMBalancePercent - thresholdDistance, // hot
-                    mapHeatPercent
-                );
-
                 Refresh();
             }
         }
@@ -98,13 +101,22 @@ namespace BetterDamage
             if (player == null)
                 return;
 
-            overheatRPMThreshold = GameEntryPoint.EventManager.playerManager.drivetrain.maxRPM * Main.settings.overheatRPMThresholdPercent / 100;
+            Drivetrain engine = GameEntryPoint.EventManager.playerManager.drivetrain;
+            overheatRPMThreshold = engine.maxRPM * Main.settings.overheatRPMThresholdPercent / 100;
+
+            int currentScene = SceneManager.GetActiveScene().buildIndex;
+            float currentTemp = mapHeatMultipliers.Find(item => currentScene >= item.min || currentScene <= item.max).temp;
+
+            // min = index 3 / max = index 6
+            float mapHeatPercent = Mathf.InverseLerp(mapHeatMultipliers[3].temp, mapHeatMultipliers[6].temp, currentTemp);
+            float thresholdDistance = (Main.settings.overheatRPMThresholdPercent - Main.settings.overheatRPMBalancePercent) / 2;
+
+            rpmBalance = Mathf.Lerp(
+                Main.settings.overheatRPMBalancePercent + thresholdDistance, // cold 
+                Main.settings.overheatRPMBalancePercent - thresholdDistance, // hot
+                mapHeatPercent
+            );
+            rpmBalance *= engine.maxRPM / 100;
         }
-
-        // __ Overheat __
-        // currentRev > ProjectForward(maxCarSpeed / 10) /*find the right ratio*/ (turbo)
-
-        // __ what do I need ? __
-        // car rigidbody (forward speed)
     }
 }
