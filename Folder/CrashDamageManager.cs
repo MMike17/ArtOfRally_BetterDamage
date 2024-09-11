@@ -8,7 +8,7 @@ using Random = UnityEngine.Random;
 namespace BetterDamage
 {
     [HarmonyPatch(typeof(PlayerCollider), "CheckForPunctureAndPerformanceDamage")]
-    static class CarDamageManager
+    static class CrashDamageManager
     {
         const float WHEEL_WIDTH = 0.7f;
         const float WHEEL_FRONT_PERCENT = 0.45f;

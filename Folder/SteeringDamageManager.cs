@@ -24,13 +24,13 @@ namespace BetterDamage
                 {
                     float currentDamage = PerformanceDamage.MAX_PERFORMANCE_CONDITION - __instance.PerformanceCondition;
 
-                    if (CarDamageManager.tiltToApply == 0 && lastDamage == currentDamage)
+                    if (CrashDamageManager.tiltToApply == 0 && lastDamage == currentDamage)
                         return;
 
                     // mapped -1 to 1
                     float tiltPercent = lastDamage == 0 ? 0 : tilt * 20 / lastDamage;
                     Main.Log("Current tilt percent : " + tiltPercent);
-                    tiltPercent = Mathf.Clamp(tiltPercent + CarDamageManager.tiltToApply, -1, 1);
+                    tiltPercent = Mathf.Clamp(tiltPercent + CrashDamageManager.tiltToApply, -1, 1);
                     Main.Log("New tilt percent : " + tiltPercent);
                     tilt = Mathf.Clamp(tiltPercent * currentDamage / 10, -0.1f, 0.1f) * 0.5f;
 
@@ -40,7 +40,7 @@ namespace BetterDamage
                     Main.SetField<float, SteeringPerfomanceDamage>(__instance, "steeringAlignmentEffect", BindingFlags.Instance, tilt);
                     GameEntryPoint.EventManager.playerManager.PlayerObject.GetComponent<AxisCarController>().SteeringOutOfAlignmentEffect = tilt;
 
-                    CarDamageManager.tiltToApply = 0;
+                    CrashDamageManager.tiltToApply = 0;
                     lastDamage = currentDamage;
                 }
             });
