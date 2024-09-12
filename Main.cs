@@ -19,6 +19,8 @@ namespace BetterDamage
         static Material markerMat;
         static List<GameObject> markers;
 
+        public static bool InReplay => ReplayManager.Instance()?.CurrentState == ReplayManager.ReplayState.Playback;
+
         // Called by the mod manager
         static bool Load(ModEntry modEntry)
         {
@@ -141,5 +143,8 @@ namespace BetterDamage
             toRemove.Reverse();
             toRemove.ForEach(index => markers.RemoveAt(index));
         }
+
+        // TODO : Test old version of mods to see if the update button appears
+        // TODO : Set website link to repo on old mod and replace with old version to see if the "update available" button appears
     }
 }

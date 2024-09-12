@@ -38,7 +38,7 @@ namespace BetterDamage
         [HarmonyPatch("FixedUpdate")]
         static void Postfix(Drivetrain __instance)
         {
-            if (!Main.enabled || !Main.settings.enableOverheatDamage)
+            if (!Main.enabled || Main.InReplay || !Main.settings.enableOverheatDamage)
                 return;
 
             Main.Try(() =>
@@ -102,7 +102,7 @@ namespace BetterDamage
         [HarmonyPatch(nameof(Drivetrain.Shift))]
         static void Postfix(Drivetrain __instance, int m_gear)
         {
-            if (!Main.enabled || !Main.settings.enableGearboxDamage)
+            if (!Main.enabled || Main.InReplay || !Main.settings.enableGearboxDamage)
                 return;
 
             Main.Try(() =>
@@ -128,8 +128,6 @@ namespace BetterDamage
 
             Main.Try(() =>
             {
-                // TODO : /!\ disable gearbox damage when changing gear outside of play /!\
-
                 AxisCarController controller = GameEntryPoint.EventManager.playerManager.PlayerObject.GetComponent<AxisCarController>();
 
                 if (shiftUp && controller.throttleInput > 0 && engine.rpm < engine.shiftDownRPM)

@@ -7,6 +7,8 @@ using Random = UnityEngine.Random;
 
 namespace BetterDamage
 {
+    // TODO : Add body damage by default / to all crash damage
+
     [HarmonyPatch(typeof(PlayerCollider), "CheckForPunctureAndPerformanceDamage")]
     static class CrashDamageManager
     {
@@ -23,7 +25,7 @@ namespace BetterDamage
 
         static bool Prefix(PlayerCollider __instance, Collision collInfo)
         {
-            if (!Main.enabled)
+            if (!Main.enabled || Main.InReplay)
                 return true;
 
             Main.Try(() =>
@@ -61,7 +63,7 @@ namespace BetterDamage
                         return;
                     }
 
-                    if (damageAngle > backSlice.x && damageAngle < backSlice.y && isPerformanceDamageEnabled)
+                    if (isPerformanceDamageEnabled && Main.settings.enableGearboxDamage && damageAngle > backSlice.x && damageAngle < backSlice.y)
                     {
                         CarUtils.DamagePart(__instance, magnitudePercent, SystemToRepair.GEARBOX);
                         return;

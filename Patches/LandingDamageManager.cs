@@ -17,8 +17,8 @@ namespace BetterDamage
         static void Prefix(Arcader __instance)
         {
             if (!Main.enabled ||
+                Main.InReplay ||
                 GameModeManager.GameMode == GameModeManager.GAME_MODES.FREEROAM ||
-                GameEntryPoint.EventManager.status != EventStatusEnums.EventStatus.UNDERWAY ||
                 !Main.settings.enableLandingDamage)
                 return;
 

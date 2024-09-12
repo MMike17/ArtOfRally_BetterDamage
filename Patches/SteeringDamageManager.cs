@@ -11,7 +11,7 @@ namespace BetterDamage
 
         static bool Prefix(SteeringPerfomanceDamage __instance)
         {
-            if (!Main.enabled)
+            if (!Main.enabled || Main.InReplay)
                 return true;
 
             Main.Try(() =>
@@ -56,7 +56,7 @@ namespace BetterDamage
     {
         static void Prefix(PerformanceDamage __instance)
         {
-            if (!Main.enabled || !(__instance is SteeringPerfomanceDamage))
+            if (!Main.enabled || Main.InReplay || !(__instance is SteeringPerfomanceDamage))
                 return;
 
             Main.Try(() =>
