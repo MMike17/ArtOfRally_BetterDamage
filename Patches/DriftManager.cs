@@ -12,7 +12,7 @@ namespace BetterDamage
     {
         const float DRIFT_SLIP_THRESHOLD = 0.9f;
         const float DRIFT_DURATION_THRESHOLD = 20;
-        const float DRIFT_PUNCTURE_COOLDOWN = 15;
+        const float DRIFT_PUNCTURE_COOLDOWN = 60 * 5;
 
         static Dictionary<Wheel, float> wheelDriftDuration;
         static Dictionary<Wheel, bool> wheelInCooldown;
