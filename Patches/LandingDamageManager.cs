@@ -77,6 +77,8 @@ namespace BetterDamage
                     CarUtils.DamagePart(collider, magnitudePercent, SystemToRepair.SUSPENSION);
                 }
             }
+
+            waitRoutine = null;
         }
     }
 }
