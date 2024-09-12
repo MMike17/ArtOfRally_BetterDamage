@@ -19,6 +19,7 @@ namespace BetterDamage
         static PlayerCollider player;
         static Vector2[] wheelsSlice; // front 0 1 / back 2 3
         static Vector2 radiatorSlice;
+        static Vector2 backSlice;
 
         static bool Prefix(PlayerCollider __instance, Collision collInfo)
         {
@@ -57,6 +58,12 @@ namespace BetterDamage
                         if (probability < Main.settings.crashHeadlightProbability)
                             GameEntryPoint.EventManager.playerManager.headlightManager.ReduceHeadlightStrength();
 
+                        return;
+                    }
+
+                    if (damageAngle > backSlice.x && damageAngle < backSlice.y && isPerformanceDamageEnabled)
+                    {
+                        CarUtils.DamagePart(__instance, magnitudePercent, SystemToRepair.GEARBOX);
                         return;
                     }
 
@@ -145,6 +152,9 @@ namespace BetterDamage
 
             radiatorSlice = new Vector2(wheelsSlice[0].x, wheelsSlice[1].x);
             Main.Log("Radiator angle :\nmin : " + radiatorSlice.x + "\nmax : " + radiatorSlice.y);
+
+            backSlice = new Vector2(wheelsSlice[2].y, wheelsSlice[3].y);
+            Main.Log("Gearbox back angle :\nmin : " + backSlice.x + "\nmax : " + backSlice.y);
         }
     }
 }
