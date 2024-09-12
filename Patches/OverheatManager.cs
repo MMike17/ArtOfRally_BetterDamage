@@ -1,4 +1,5 @@
 ﻿using HarmonyLib;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -15,6 +16,7 @@ namespace BetterDamage
         const int MIN_TURBO_SPEED = 10; // 20 km/h
         const int MAX_TURBO_SPEED = 50; // 100 km/h
         const float TURBO_DAMAGE_RATE = 0.1f;
+        const float GEARBOX_DAMAGE_RATE = 0.1f;
 
         static List<(int min, int max, float temp)> mapHeatMultipliers = new List<(int, int, float)>()
         {
@@ -31,6 +33,7 @@ namespace BetterDamage
         static float overheatRPMThreshold;
         static float overheatCount;
         static float rpmBalance;
+        static Coroutine shiftRoutine;
 
         [HarmonyPatch("FixedUpdate")]
         static void Postfix(Drivetrain __instance)
@@ -40,7 +43,7 @@ namespace BetterDamage
 
             Main.Try(() =>
             {
-                GenerateIfNeeded(__instance);
+                GenerateIfNeeded();
 
                 if (__instance.rpm >= overheatRPMThreshold)
                     overheatCount = Mathf.MoveTowards(overheatCount, MAX_OVERHEAT, Time.fixedDeltaTime);
@@ -85,7 +88,7 @@ namespace BetterDamage
             });
         }
 
-        static void GenerateIfNeeded(Drivetrain engine)
+        static void GenerateIfNeeded()
         {
             if (player == null)
             {
@@ -94,6 +97,54 @@ namespace BetterDamage
 
                 Refresh();
             }
+        }
+
+        [HarmonyPatch(nameof(Drivetrain.Shift))]
+        static void Postfix(Drivetrain __instance, int m_gear)
+        {
+            if (!Main.enabled || !Main.settings.enableGearboxDamage)
+                return;
+
+            Main.Try(() =>
+            {
+                Main.Log("Detected shifting (from : " + __instance.gear + " to " + m_gear + ")");
+
+                // ignore neutral
+                if (__instance.gear != 1 && m_gear != 1 && __instance.gear != m_gear)
+                {
+                    if (shiftRoutine != null)
+                        __instance.StopCoroutine(nameof(WaitForEndOfShifting));
+
+                    __instance.StartCoroutine(WaitForEndOfShifting(__instance, __instance.gear < m_gear));
+                }
+            });
+        }
+
+        static IEnumerator WaitForEndOfShifting(Drivetrain engine, bool shiftUp)
+        {
+            Main.Log("Waiting for end of shift");
+            yield return new WaitUntil(() => engine.changingGear == false);
+            yield return new WaitForSeconds(0.5f);
+
+            Main.Try(() =>
+            {
+                // TODO : /!\ disable gearbox damage when changing gear outside of play /!\
+
+                AxisCarController controller = GameEntryPoint.EventManager.playerManager.PlayerObject.GetComponent<AxisCarController>();
+
+                if (shiftUp && controller.throttleInput > 0 && engine.rpm < engine.shiftDownRPM)
+                {
+                    Main.Log("Detected under rev with ratio : " + engine.shiftDownRPM / engine.rpm);
+                    CarUtils.DamagePart(player, GEARBOX_DAMAGE_RATE * engine.shiftDownRPM / engine.rpm, SystemToRepair.GEARBOX);
+                }
+                else if (engine.rpm > engine.shiftUpRPM)
+                {
+                    Main.Log("Detected over rev with ratio : " + engine.rpm / engine.shiftUpRPM);
+                    CarUtils.DamagePart(player, GEARBOX_DAMAGE_RATE * engine.rpm / engine.shiftUpRPM, SystemToRepair.GEARBOX);
+                }
+
+                shiftRoutine = null;
+            });
         }
 
         public static void Refresh()

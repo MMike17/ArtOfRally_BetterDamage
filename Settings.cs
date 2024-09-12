@@ -7,8 +7,6 @@ namespace BetterDamage
 {
     public class Settings : ModSettings, IDrawable
     {
-        // [Draw(DrawType.)]
-
         [Header("Debug")]
         [Draw(DrawType.Toggle)]
         public bool showMarkers = false;
@@ -52,6 +50,10 @@ namespace BetterDamage
         public float overheatRPMBalancePercent = 70;
         [Draw(DrawType.Slider, Min = 0.1f, Max = 1.5f, VisibleOn = "enableOverheatDamage|true", Precision = 1)]
         public float overheatCooldownSpeedMult = 0.7f;
+
+        [Header("Gearbox")]
+        [Draw(DrawType.Toggle)]
+        public bool enableGearboxDamage = true;
 
         public override void Save(ModEntry modEntry)
         {
