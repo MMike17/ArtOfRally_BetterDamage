@@ -116,6 +116,7 @@ namespace BetterDamage
             {
                 markerMat = new Material(Shader.Find("Standard"));
                 markerMat.color = Color.red;
+                markerMat.globalIlluminationFlags = MaterialGlobalIlluminationFlags.None;
                 markerMat.SetColor("_EmissionColor", Color.red);
             }
 
@@ -143,8 +144,5 @@ namespace BetterDamage
             toRemove.Reverse();
             toRemove.ForEach(index => markers.RemoveAt(index));
         }
-
-        // TODO : Test old version of mods to see if the update button appears
-        // TODO : Set website link to repo on old mod and replace with old version to see if the "update available" button appears
     }
 }
