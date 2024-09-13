@@ -7,15 +7,12 @@ using Random = UnityEngine.Random;
 
 namespace BetterDamage
 {
-    // TODO : Fix body damage super 
-
     [HarmonyPatch(typeof(PlayerCollider), "CheckForPunctureAndPerformanceDamage")]
     static class CrashDamageManager
     {
         const float WHEEL_WIDTH = 0.7f;
         const float WHEEL_FRONT_PERCENT = 0.45f;
         const float MAX_TILT_DAMAGE = 0.5f;
-        const float BODY_DAMAGE_RATE = 0.1f;
 
         public static float tiltToApply;
 
@@ -68,7 +65,8 @@ namespace BetterDamage
                         if (Main.settings.enableGearboxDamage && (damageAngle < backSlice.x || damageAngle > backSlice.y))
                             CarUtils.DamagePart(__instance, magnitudePercent, SystemToRepair.GEARBOX);
 
-                        CarUtils.DamagePart(__instance, magnitudePercent * BODY_DAMAGE_RATE, SystemToRepair.CLEANCAR);
+                        // Can't damage body more than that...
+                        CarUtils.DamagePart(__instance, magnitudePercent, SystemToRepair.CLEANCAR);
                     }
 
                     for (int i = 0; i < wheelsSlice.Length; i++)
