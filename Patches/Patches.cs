@@ -1,13 +1,5 @@
 using HarmonyLib;
-using System.Collections;
-using System.Collections.Generic;
-using System.Linq;
-using System.Reflection;
-using UnityEngine;
 
-using static RepairsManagerUI;
-using static UnityModManagerNet.UnityModManager;
-using Random = UnityEngine.Random;
 
 namespace BetterDamage
 {
@@ -17,6 +9,4 @@ namespace BetterDamage
     {
         static bool Prefix() => !Main.enabled || !Main.settings.disableWearAndTear;
     }
-
-    // TODO : Remove spammy logs
 }
