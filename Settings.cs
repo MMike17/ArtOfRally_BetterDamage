@@ -12,7 +12,7 @@ namespace BetterDamage
         public bool showMarkers = false;
 
         [Header("General")]
-        public bool disableWearAndTear;
+        public bool disableWearAndTear = true;
 
         [Header("Landing")]
         [Draw(DrawType.Toggle)]
