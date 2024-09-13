@@ -7,7 +7,7 @@ using Random = UnityEngine.Random;
 
 namespace BetterDamage
 {
-    // TODO : Add body damage by default / to all crash damage
+    // TODO : Fix body damage super 
 
     [HarmonyPatch(typeof(PlayerCollider), "CheckForPunctureAndPerformanceDamage")]
     static class CrashDamageManager
@@ -15,6 +15,7 @@ namespace BetterDamage
         const float WHEEL_WIDTH = 0.7f;
         const float WHEEL_FRONT_PERCENT = 0.45f;
         const float MAX_TILT_DAMAGE = 0.5f;
+        const float BODY_DAMAGE_RATE = 0.1f;
 
         public static float tiltToApply;
 
@@ -45,28 +46,29 @@ namespace BetterDamage
                     Transform player = GameEntryPoint.EventManager.playerManager.PlayerObject.transform;
                     float damageAngle = Vector3.SignedAngle(player.forward, collInfo.contacts[0].point - player.position, player.up);
 
-                    Main.Log("Damage angle : " + damageAngle);
-
                     float MAX_CRASH_MAGNITUDE = Main.GetField<float, PlayerCollider>(__instance, "MAX_MAGNITUDE_CRASH", BindingFlags.Instance);
                     float magnitudePercent = Mathf.InverseLerp(MIN_CRASH_MAGNITUDE, MAX_CRASH_MAGNITUDE, collInfo.relativeVelocity.magnitude);
 
                     float probability = Random.Range(0f, 100f);
 
-                    if (damageAngle > radiatorSlice.x && damageAngle < radiatorSlice.y)
+                    if (!Main.settings.disableInfoLogs)
+                        Main.Log("Crash at angle : " + damageAngle + " with magnitude : " + Mathf.FloorToInt(magnitudePercent * 100) + "%");
+
+                    if (isPerformanceDamageEnabled)
                     {
-                        if (isPerformanceDamageEnabled)
-                            CarUtils.DamagePart(__instance, magnitudePercent, SystemToRepair.RADIATOR);
+                        if (damageAngle > radiatorSlice.x && damageAngle < radiatorSlice.y)
+                        {
+                            if (isPerformanceDamageEnabled)
+                                CarUtils.DamagePart(__instance, magnitudePercent, SystemToRepair.RADIATOR);
 
-                        if (probability < Main.settings.crashHeadlightProbability)
-                            GameEntryPoint.EventManager.playerManager.headlightManager.ReduceHeadlightStrength();
+                            if (probability < Main.settings.crashHeadlightProbability)
+                                GameEntryPoint.EventManager.playerManager.headlightManager.ReduceHeadlightStrength();
+                        }
 
-                        return;
-                    }
+                        if (Main.settings.enableGearboxDamage && (damageAngle < backSlice.x || damageAngle > backSlice.y))
+                            CarUtils.DamagePart(__instance, magnitudePercent, SystemToRepair.GEARBOX);
 
-                    if (isPerformanceDamageEnabled && Main.settings.enableGearboxDamage && damageAngle > backSlice.x && damageAngle < backSlice.y)
-                    {
-                        CarUtils.DamagePart(__instance, magnitudePercent, SystemToRepair.GEARBOX);
-                        return;
+                        CarUtils.DamagePart(__instance, magnitudePercent * BODY_DAMAGE_RATE, SystemToRepair.CLEANCAR);
                     }
 
                     for (int i = 0; i < wheelsSlice.Length; i++)
@@ -83,7 +85,9 @@ namespace BetterDamage
                                     // 0 = -1 / 1 = 1
                                     float side = (i - 0.5f) * 2;
                                     tiltToApply = magnitudePercent * MAX_TILT_DAMAGE * side;
-                                    Main.Log("New tilt damage : " + tiltToApply);
+
+                                    if (!Main.settings.disableInfoLogs)
+                                        Main.Log("New tilt damage : " + tiltToApply);
                                 }
 
                                 CarUtils.DamagePart(__instance, magnitudePercent, SystemToRepair.SUSPENSION);
@@ -149,14 +153,19 @@ namespace BetterDamage
                     Vector3.SignedAngle(playerTr.forward, backPos - playerTr.position, playerTr.up)
                 );
 
-                Main.Log("Wheel " + i + " angle :\nmin : " + wheelsSlice[i].x + "\nmax : " + wheelsSlice[i].y);
+                if (!Main.settings.disableInfoLogs)
+                    Main.Log("Wheel " + i + " angle :\nmin : " + wheelsSlice[i].x + "\nmax : " + wheelsSlice[i].y);
             }
 
             radiatorSlice = new Vector2(wheelsSlice[0].x, wheelsSlice[1].x);
-            Main.Log("Radiator angle :\nmin : " + radiatorSlice.x + "\nmax : " + radiatorSlice.y);
+
+            if (!Main.settings.disableInfoLogs)
+                Main.Log("Radiator angle :\nmin : " + radiatorSlice.x + "\nmax : " + radiatorSlice.y);
 
             backSlice = new Vector2(wheelsSlice[2].y, wheelsSlice[3].y);
-            Main.Log("Gearbox back angle :\nmin : " + backSlice.x + "\nmax : " + backSlice.y);
+
+            if (!Main.settings.disableInfoLogs)
+                Main.Log("Gearbox back angle :\nmin : " + backSlice.x + "\nmax : " + backSlice.y);
         }
     }
 }
