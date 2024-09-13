@@ -29,12 +29,11 @@ namespace BetterDamage
 
                     // mapped -1 to 1
                     float tiltPercent = lastDamage == 0 ? 0 : tilt * 20 / lastDamage;
-                    Main.Log("Current tilt percent : " + tiltPercent);
                     tiltPercent = Mathf.Clamp(tiltPercent + CrashDamageManager.tiltToApply, -1, 1);
-                    Main.Log("New tilt percent : " + tiltPercent);
                     tilt = Mathf.Clamp(tiltPercent * currentDamage / 10, -0.1f, 0.1f) * 0.5f;
 
-                    Main.Log("Applied tilt : " + tilt);
+                    if (!Main.settings.disableInfoLogs)
+                        Main.Log("Applied tilt : " + tilt);
 
                     // aplly
                     Main.SetField<float, SteeringPerfomanceDamage>(__instance, "steeringAlignmentEffect", BindingFlags.Instance, tilt);

@@ -107,7 +107,8 @@ namespace BetterDamage
 
             Main.Try(() =>
             {
-                Main.Log("Detected shifting (from : " + __instance.gear + " to " + m_gear + ")");
+                if (!Main.settings.disableInfoLogs)
+                    Main.Log("Detected shifting (from : " + __instance.gear + " to " + m_gear + ")");
 
                 // ignore neutral
                 if (__instance.gear != 1 && m_gear != 1 && __instance.gear != m_gear)
@@ -122,7 +123,9 @@ namespace BetterDamage
 
         static IEnumerator WaitForEndOfShifting(Drivetrain engine, bool shiftUp)
         {
-            Main.Log("Waiting for end of shift");
+            if (!Main.settings.disableInfoLogs)
+                Main.Log("Waiting for end of shift");
+
             yield return new WaitUntil(() => engine.changingGear == false);
             yield return new WaitForSeconds(0.5f);
 
@@ -132,12 +135,16 @@ namespace BetterDamage
 
                 if (shiftUp && controller.throttleInput > 0 && engine.rpm < engine.shiftDownRPM)
                 {
-                    Main.Log("Detected under rev with ratio : " + engine.shiftDownRPM / engine.rpm);
+                    if (!Main.settings.disableInfoLogs)
+                        Main.Log("Detected under rev with ratio : " + engine.shiftDownRPM / engine.rpm);
+
                     CarUtils.DamagePart(player, GEARBOX_DAMAGE_RATE * engine.shiftDownRPM / engine.rpm, SystemToRepair.GEARBOX);
                 }
                 else if (engine.rpm > engine.shiftUpRPM)
                 {
-                    Main.Log("Detected over rev with ratio : " + engine.rpm / engine.shiftUpRPM);
+                    if (!Main.settings.disableInfoLogs)
+                        Main.Log("Detected over rev with ratio : " + engine.rpm / engine.shiftUpRPM);
+
                     CarUtils.DamagePart(player, GEARBOX_DAMAGE_RATE * engine.rpm / engine.shiftUpRPM, SystemToRepair.GEARBOX);
                 }
 

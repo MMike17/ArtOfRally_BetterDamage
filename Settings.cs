@@ -7,10 +7,6 @@ namespace BetterDamage
 {
     public class Settings : ModSettings, IDrawable
     {
-        [Header("Debug")]
-        [Draw(DrawType.Toggle)]
-        public bool showMarkers = false;
-
         [Header("General")]
         public bool disableWearAndTear = true;
 
@@ -57,6 +53,12 @@ namespace BetterDamage
         [Header("Gearbox")]
         [Draw(DrawType.Toggle)]
         public bool enableGearboxDamage = true;
+
+        [Header("Debug")]
+        [Draw(DrawType.Toggle)]
+        public bool showMarkers = false;
+        [Draw(DrawType.Toggle)]
+        public bool disableInfoLogs = true;
 
         public override void Save(ModEntry modEntry)
         {

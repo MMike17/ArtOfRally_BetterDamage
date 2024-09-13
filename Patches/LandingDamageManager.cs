@@ -35,7 +35,8 @@ namespace BetterDamage
 
             float landingForce = -GameEntryPoint.EventManager.playerManager.playerRigidBody.velocity.y;
 
-            Main.Log("Detected landing with force : " + landingForce);
+            if (!Main.settings.disableInfoLogs)
+                Main.Log("Detected landing with force : " + landingForce);
 
             if (landingForce > Main.settings.minLandingThreshold)
             {
@@ -64,7 +65,9 @@ namespace BetterDamage
                     {
                         if (wheel.tirePuncture)
                         {
-                            Main.Log("A tire is already punctured. Aborting.");
+                            if (!Main.settings.disableInfoLogs)
+                                Main.Log("A tire is already punctured. Aborting.");
+
                             yield break;
                         }
                     }
