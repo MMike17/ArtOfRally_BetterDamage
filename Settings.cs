@@ -11,6 +11,9 @@ namespace BetterDamage
         [Draw(DrawType.Toggle)]
         public bool showMarkers = false;
 
+        [Header("General")]
+        public bool disableWearAndTear;
+
         [Header("Landing")]
         [Draw(DrawType.Toggle)]
         public bool enableLandingDamage = true;
