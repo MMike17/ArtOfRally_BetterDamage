@@ -10,6 +10,7 @@ namespace BetterDamage
         [Header("General")]
         [Draw(DrawType.Toggle)]
         public bool disableWearAndTear = true;
+        public bool wearAndTearBody = true;
 
         [Header("Landing")]
         [Draw(DrawType.Toggle)]
