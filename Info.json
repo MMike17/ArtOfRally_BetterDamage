@@ -2,8 +2,10 @@
 	"Id": "BetterDamage",
 	"DisplayName": "Better Damage",
 	"Author": "MMike17",
-	"Version": "0.9.0",
+	"Version": "1.0.0",
 	"GameVersion": "1.5,5",
 	"AssemblyName": "BetterDamage.dll",
-	"EntryMethod": "BetterDamage.Main.Load"
+	"EntryMethod": "BetterDamage.Main.Load",
+	"HomePage": "https://www.nexusmods.com/artofrally/mods/13",
+	"Repository": "https://github.com/MMike17/ArtOfRally_BetterDamage"
 }
