@@ -104,6 +104,20 @@ namespace BetterDamage
             return (U)info.Invoke(source, args);
         }
 
+        /// <summary>BindingFlags.NonPrivate is implicit</summary>
+        public static void InvokeMethod<T>(T source, string methodName, BindingFlags flags, object[] args)
+        {
+            MethodInfo info = source.GetType().GetMethod(methodName, flags | BindingFlags.NonPublic);
+
+            if (info == null)
+            {
+                Error("Couldn't find method info for method \"" + methodName + "\" in type \"" + source.GetType() + "\"");
+                return;
+            }
+
+            info.Invoke(source, args);
+        }
+
         public static void SetMarkers(bool state)
         {
             CleanMarkerList();
