@@ -161,10 +161,18 @@ namespace BetterDamage
             overheatRPMThreshold = engine.maxRPM * Main.settings.overheatRPMThresholdPercent / 100;
 
             int currentScene = SceneManager.GetActiveScene().buildIndex;
-            float currentTemp = mapHeatMultipliers.Find(item => currentScene >= item.min || currentScene <= item.max).temp;
+            (int min, int max, float temp) map = mapHeatMultipliers.Find(item => currentScene >= item.min || currentScene <= item.max);
+
+            // in case someone has custom maps
+            if (map == (0, 0, 0f))
+            {
+                Main.Error("Couldn't find temperature for scene : " + SceneManager.GetActiveScene().name + ". Defaulting to exact value.");
+                rpmBalance = engine.maxRPM * Main.settings.overheatRPMBalancePercent / 100;
+                return;
+            }
 
             // min = index 3 / max = index 6
-            float mapHeatPercent = Mathf.InverseLerp(mapHeatMultipliers[3].temp, mapHeatMultipliers[6].temp, currentTemp);
+            float mapHeatPercent = Mathf.InverseLerp(mapHeatMultipliers[3].temp, mapHeatMultipliers[6].temp, map.temp);
             float thresholdDistance = (Main.settings.overheatRPMThresholdPercent - Main.settings.overheatRPMBalancePercent) / 2;
 
             rpmBalance = Mathf.Lerp(
