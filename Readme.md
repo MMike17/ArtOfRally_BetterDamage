@@ -113,57 +113,57 @@ Adjust toggles and settings in each sections to select what damages you want to 
 
 By default, the mod doesn't change the behaviour of the game.
 
-#### General
+### General
 
 - **disableWearAndTear** : will disable the damage applied to multiple car parts at the end of a stage (I recommend this to make the damages more fair).\
 - **wearAndTearBody** : will re-enable wear and tear for the car body only (necessitates **disableWearAndTear** to be toggled on).
 
-#### Landing
+### Landing
 
 - **enableLandingDamage** : will enable damages on the car when it lands from a jump. This will display all other settings in this category.
 
-"minLandingThreshold" is the minimum landing force to consider damages to the car.\
-"maxLandingThreshold" is the maximum landing force to consider damages to the car.\
-"landingDamageMultiplier" is a multiplier for damages dealt by jump landings.\
-"landingPunctureThreshold" is the landing strength percent threshold above which a tire can be punctured upon landing (default 90%).\
-"landingPunctureProbability" is the probability percent that a tire will puncture upon landing if the landing strength is over the threshold (default 0.5%).
+- **minLandingThreshold** : is the minimum landing force to consider damages to the car.
+- **maxLandingThreshold** : is the maximum landing force to consider damages to the car.
+- **landingDamageMultiplier** : is a multiplier for damages dealt by jump landings.
+- **landingPunctureThreshold** : is the landing strength percent threshold above which a tire can be punctured upon landing (default 90%).
+- **landingPunctureProbability** : is the probability percent that a tire will puncture upon landing if the landing strength is over the threshold (default 0.5%).
 
-#### Crash
+### Crash
 
-"crashPunctureThreshold" is the crash strength percent threshold above which a tire can be punctures upon crashing.\
-"crashPunctureProbability" is the probability percent that a tire will puncture upon crashing if the crash strength is over the threshold (default 0.5%).\
-"crashHeadlightProbability" is the probability percent that the headlights will be damaged upon crashing if the crash strength is over the threshold (default 8%).
+- **crashPunctureThreshold** : is the crash strength percent threshold above which a tire can be punctures upon crashing.
+- **crashPunctureProbability** : is the probability percent that a tire will puncture upon crashing if the crash strength is over the threshold (default 0.5%).
+- **crashHeadlightProbability** : is the probability percent that the headlights will be damaged upon crashing if the crash strength is over the threshold (default 8%).
 
 #### Drift
 
-"enableDriftDamage" will enable damages on the car when it drifts. This will display all other settings in this category.
+- **enableDriftDamage** : will enable damages on the car when it drifts. This will display all other settings in this category.
 
-"driftPunctureProbability" is the probability percent that a tire will puncture after 20 seconds of drifting (cumulative / default 1%).
+- **driftPunctureProbability** : is the probability percent that a tire will puncture after 20 seconds of drifting (cumulative / default 1%).
 
 #### Overheat
 
-"enableOverheatDamage" will enable the overheat damages to the engine and turbo (if the car has one). Thus will display all other settings in the category.
+- **enableOverheatDamage** : will enable the overheat damages to the engine and turbo (if the car has one). Thus will display all other settings in the category.
 
-"overheatRPMThresholdPercent" is the engine RPM percent threshold above which the engine will enter overheat status.\
-"overheatRPMBalancePercent" is the engine RPM percent threshold under which the engine will cool down the most efficiently.\
-"overheatSpeedMult" .\
-"overheatCooldownSpeedMult" is a multiplier for the speed at which the engine can cool down.
+- **overheatRPMThresholdPercent** : is the engine RPM percent threshold above which the engine will enter overheat status.
+- **overheatRPMBalancePercent** : is the engine RPM percent threshold under which the engine will cool down the most efficiently.
+- **overheatSpeedMult** : is a multiplier for the speed at which the engine reaches the state of overheating.
+- **overheatCooldownSpeedMult** : is a multiplier for the speed at which the engine can cool down.
 
 #### Gearbox
 
-"enableGearboxDamage" will enable damages on the gearbox when switching gears.
+- **enableGearboxDamage** : will enable damages on the gearbox when switching gears.
 
 #### Debug
 
-"showMarkers" will display markers around a car (bright red spheres) after a collision. These markers display the edges between damage zones.\
-"disableInfoLogs" will disable the logging of "info" level logs in the mod manager's console.
+- **showMarkers** : will display markers around a car (bright red spheres) after a collision. These markers display the edges between damage zones.
+- **disableInfoLogs** : will disable the logging of *info* level logs in the mod manager's console.
 
-Disabling the mod in the manager will revert to the original damage triggering method (only in crashes and random) by default.
+Disabling the mod in the manager will revert to the original damage triggering method (only in crashes and wear and tear) by default.
 
 ## Disclaimer
 
-Body damage is kept low on crash. This is not intentional.\
-I couldn't find a way to deal more damage to the car body (clean car repair option).
+Damage dealt to the body is low. This is not intentional.\
+I couldn't find a way to deal more damage to the car body.
 
 ## Installation
 
@@ -176,8 +176,9 @@ and drop it into the mod manager's mods page.
 
 ![](Screenshots/Settings.png)
 
-<!-- Change this into a section to speak about the Damage UI mod -->
-<!-- ## Requirements
+## Bonus
 
-This mod requires the "..." that you can find [here](https://github.com/MMike17/BetterDamage).\
-Latest release [![](https://img.shields.io/github/v/release/MMike17/?label=Real%20car%20names)](https://github.com/MMike17/BetterDamage/releases/latest) -->
+Want to see the damages your car has sustained while in-stage ?\
+You can try the Damage UI mod to display special UI representing the current state of your car's parts.
+
+[![](https://img.shields.io/github/v/release/MMike17/ArtOfRally_DamageUI?label=Download%20Damage%20UI)](https://github.com/MMike17/ArtOfRally_DamageUI/releases/latest)
