@@ -46,7 +46,7 @@ namespace BetterDamage
                 GenerateIfNeeded();
 
                 if (__instance.rpm >= overheatRPMThreshold)
-                    overheatCount = Mathf.MoveTowards(overheatCount, MAX_OVERHEAT, Time.fixedDeltaTime);
+                    overheatCount = Mathf.MoveTowards(overheatCount, MAX_OVERHEAT, Main.settings.overheatSpeedMult * Time.fixedDeltaTime);
                 else
                 {
                     // progressive cooldown

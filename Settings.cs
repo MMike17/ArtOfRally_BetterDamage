@@ -8,6 +8,7 @@ namespace BetterDamage
     public class Settings : ModSettings, IDrawable
     {
         [Header("General")]
+        [Draw(DrawType.Toggle)]
         public bool disableWearAndTear = true;
 
         [Header("Landing")]
@@ -47,6 +48,8 @@ namespace BetterDamage
         public float overheatRPMThresholdPercent = 82;
         [Draw(DrawType.Slider, Min = 50, Max = 80, VisibleOn = "enableOverheatDamage|true", Precision = 0)]
         public float overheatRPMBalancePercent = 70;
+        [Draw(DrawType.Slider, Min = 0.5f, Max = 1.5f, VisibleOn = "enableOverheatDamage|true", Precision = 1)]
+        public float overheatSpeedMult = 1;
         [Draw(DrawType.Slider, Min = 0.1f, Max = 1.5f, VisibleOn = "enableOverheatDamage|true", Precision = 1)]
         public float overheatCooldownSpeedMult = 0.7f;
 
