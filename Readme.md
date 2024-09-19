@@ -1,6 +1,6 @@
 ﻿# Better Damage
 
-[![](https://img.shields.io/github/v/release/MMike17/BetterDamage?label=Download)](https://github.com/MMike17/BetterDamage/releases/latest)
+[![](https://img.shields.io/github/v/release/MMike17/ArtOfRally_BetterDamage?label=Download)](https://github.com/MMike17/ArtOfRally_BetterDamage/releases/latest)
 ![](https://img.shields.io/badge/Game%20Version-v1.5.5-blue)
 
 A mod for Art of Rally that changes how cars take damage to be more fun.
