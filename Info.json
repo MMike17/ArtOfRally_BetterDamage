@@ -2,7 +2,7 @@
 	"Id": "BetterDamage",
 	"DisplayName": "Better Damage",
 	"Author": "MMike17",
-	"Version": "1.0.1",
+	"Version": "1.0.2",
 	"GameVersion": "1.5,5",
 	"AssemblyName": "BetterDamage.dll",
 	"EntryMethod": "BetterDamage.Main.Load",
