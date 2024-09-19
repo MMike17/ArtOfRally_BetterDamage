@@ -22,6 +22,8 @@ namespace BetterDamage.Patches
 
             Main.Try(() =>
             {
+                GenerateIfNeeded();
+
                 if (!Main.settings.disableInfoLogs)
                     Main.Log("Detected shifting (from : " + __instance.gear + " to " + m_gear + ")");
 
