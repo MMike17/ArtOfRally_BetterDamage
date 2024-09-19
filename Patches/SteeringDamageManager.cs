@@ -1,4 +1,5 @@
 ﻿using HarmonyLib;
+using System.Collections;
 using System.Reflection;
 using UnityEngine;
 
@@ -37,7 +38,9 @@ namespace BetterDamage
 
                     // aplly
                     Main.SetField<float, SteeringPerfomanceDamage>(__instance, "steeringAlignmentEffect", BindingFlags.Instance, tilt);
-                    GameEntryPoint.EventManager.playerManager.PlayerObject.GetComponent<AxisCarController>().SteeringOutOfAlignmentEffect = tilt;
+
+                    GameEntryPoint entry = GameObject.FindObjectOfType<GameEntryPoint>();
+                    entry.StartCoroutine(WaitUntilReady(entry, tilt));
 
                     CrashDamageManager.tiltToApply = 0;
                     lastDamage = currentDamage;
@@ -45,6 +48,14 @@ namespace BetterDamage
             });
 
             return false;
+        }
+
+        static IEnumerator WaitUntilReady(GameEntryPoint entry, float tilt)
+        {
+            FieldInfo info = entry.GetType().GetField("eventManager", BindingFlags.Static | BindingFlags.NonPublic);
+            yield return new WaitUntil(() => info.GetValue(entry) != null);
+
+            GameEntryPoint.EventManager.playerManager.PlayerObject.GetComponent<AxisCarController>().SteeringOutOfAlignmentEffect = tilt;
         }
 
         public static void Reset() => lastDamage = 0;
