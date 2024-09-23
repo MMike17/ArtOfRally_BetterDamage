@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
+using static EventStatusEnums;
 using static RepairsManagerUI;
 
 namespace BetterDamage
@@ -35,12 +36,13 @@ namespace BetterDamage
         [HarmonyPatch("FixedUpdate")]
         static void Postfix(Drivetrain __instance)
         {
-            if (!Main.enabled || Main.InReplay || !Main.settings.enableOverheatDamage)
+            if (!Main.enabled || !Main.settings.enableOverheatDamage || GameEntryPoint.EventManager.status != EventStatus.UNDERWAY)
                 return;
 
             Main.Try(() =>
             {
-                GenerateIfNeeded();
+                if (!CheckReady())
+                    return;
 
                 if (__instance.rpm >= overheatRPMThreshold)
                     overheatCount = Mathf.MoveTowards(overheatCount, MAX_OVERHEAT, Main.settings.overheatSpeedMult * Time.fixedDeltaTime);
@@ -85,15 +87,17 @@ namespace BetterDamage
             });
         }
 
-        static void GenerateIfNeeded()
+        static bool CheckReady()
         {
-            if (player == null)
+            if (player == null && GameEntryPoint.EventManager.playerManager.PlayerObject != null)
             {
                 player = GameEntryPoint.EventManager.playerManager.PlayerObject.GetComponent<PlayerCollider>();
-                overheatCount = 0;
 
+                overheatCount = 0;
                 Refresh();
             }
+
+            return player != null;
         }
 
         public static void Refresh()
