@@ -3,6 +3,8 @@ using System.Collections;
 using System.Reflection;
 using UnityEngine;
 
+using static EventStatusEnums;
+
 namespace BetterDamage
 {
     [HarmonyPatch(typeof(SteeringPerfomanceDamage), nameof(SteeringPerfomanceDamage.SetPerformance))]
@@ -12,7 +14,8 @@ namespace BetterDamage
 
         static bool Prefix(SteeringPerfomanceDamage __instance)
         {
-            if (!Main.enabled || Main.InReplay)
+            // DO NOT ADD THE REPLAY CHECK HERE (it crashes the game in a very weird way)
+            if (!Main.enabled)
                 return true;
 
             Main.Try(() =>
@@ -37,12 +40,9 @@ namespace BetterDamage
                         Main.Log("Applied tilt : " + tilt);
 
                     // aplly
-                    Main.SetField<float, SteeringPerfomanceDamage>(__instance, "steeringAlignmentEffect", BindingFlags.Instance, tilt);
-
                     GameEntryPoint entry = GameObject.FindObjectOfType<GameEntryPoint>();
-                    entry.StartCoroutine(WaitUntilReady(entry, tilt));
+                    entry.StartCoroutine(WaitUntilReady(entry, __instance, tilt));
 
-                    CrashDamageManager.tiltToApply = 0;
                     lastDamage = currentDamage;
                 }
             });
@@ -50,12 +50,18 @@ namespace BetterDamage
             return false;
         }
 
-        static IEnumerator WaitUntilReady(GameEntryPoint entry, float tilt)
+        static IEnumerator WaitUntilReady(GameEntryPoint entry, SteeringPerfomanceDamage instance, float tilt)
         {
             FieldInfo info = entry.GetType().GetField("eventManager", BindingFlags.Static | BindingFlags.NonPublic);
             yield return new WaitUntil(() => info.GetValue(entry) != null);
 
+            if (GameEntryPoint.EventManager.status != EventStatus.UNDERWAY)
+                yield break;
+
+            Main.SetField<float, SteeringPerfomanceDamage>(instance, "steeringAlignmentEffect", BindingFlags.Instance, tilt);
             GameEntryPoint.EventManager.playerManager.PlayerObject.GetComponent<AxisCarController>().SteeringOutOfAlignmentEffect = tilt;
+
+            CrashDamageManager.tiltToApply = 0;
         }
 
         public static void Reset() => lastDamage = 0;
@@ -66,7 +72,7 @@ namespace BetterDamage
     {
         static void Prefix(PerformanceDamage __instance)
         {
-            if (!Main.enabled || Main.InReplay || !(__instance is SteeringPerfomanceDamage))
+            if (!Main.enabled || !(__instance is SteeringPerfomanceDamage))
                 return;
 
             Main.Try(() =>
