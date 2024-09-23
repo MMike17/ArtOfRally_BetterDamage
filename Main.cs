@@ -19,8 +19,6 @@ namespace BetterDamage
         static Material markerMat;
         static List<GameObject> markers;
 
-        public static bool InReplay => ReplayManager.Instance()?.CurrentState == ReplayManager.ReplayState.Playback;
-
         // Called by the mod manager
         static bool Load(ModEntry modEntry)
         {

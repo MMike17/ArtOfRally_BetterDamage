@@ -3,6 +3,7 @@ using System.Collections;
 using System.Reflection;
 using UnityEngine;
 
+using static EventStatusEnums;
 using static RepairsManagerUI;
 using Random = UnityEngine.Random;
 
@@ -17,9 +18,9 @@ namespace BetterDamage
         static void Prefix(Arcader __instance)
         {
             if (!Main.enabled ||
-                Main.InReplay ||
                 GameModeManager.GameMode == GameModeManager.GAME_MODES.FREEROAM ||
-                !Main.settings.enableLandingDamage)
+                !Main.settings.enableLandingDamage ||
+                GameEntryPoint.EventManager.status != EventStatus.UNDERWAY)
                 return;
 
             if (waitRoutine != null)

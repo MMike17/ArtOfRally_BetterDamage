@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
+using static EventStatusEnums;
 using Random = UnityEngine.Random;
 
 namespace BetterDamage
@@ -19,7 +20,7 @@ namespace BetterDamage
 
         static void Postfix(Wheel __instance)
         {
-            if (!Main.enabled || Main.InReplay || !Main.settings.enableDriftDamage)
+            if (!Main.enabled || GameEntryPoint.EventManager.status != EventStatus.UNDERWAY || !Main.settings.enableDriftDamage)
                 return;
 
             Main.Try(() =>
@@ -101,7 +102,7 @@ namespace BetterDamage
     {
         static void Postfix()
         {
-            if (!Main.enabled || Main.InReplay || !Main.settings.enableDriftDamage)
+            if (!Main.enabled || !Main.settings.enableDriftDamage)
                 return;
 
             Main.Try(() => DriftManager.Reset());
@@ -113,7 +114,7 @@ namespace BetterDamage
     {
         static void Postfix()
         {
-            if (!Main.enabled || Main.InReplay || !Main.settings.enableDriftDamage)
+            if (!Main.enabled || !Main.settings.enableDriftDamage)
                 return;
 
             Main.Try(() => DriftManager.Reset());

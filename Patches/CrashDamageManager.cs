@@ -2,6 +2,7 @@
 using System.Reflection;
 using UnityEngine;
 
+using static EventStatusEnums;
 using static RepairsManagerUI;
 using Random = UnityEngine.Random;
 
@@ -23,7 +24,7 @@ namespace BetterDamage
 
         static bool Prefix(PlayerCollider __instance, Collision collInfo)
         {
-            if (!Main.enabled || Main.InReplay)
+            if (!Main.enabled || GameEntryPoint.EventManager.status != EventStatus.UNDERWAY)
                 return true;
 
             Main.Try(() =>

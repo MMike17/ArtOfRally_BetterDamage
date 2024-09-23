@@ -2,6 +2,7 @@
 using System.Collections;
 using UnityEngine;
 
+using static EventStatusEnums;
 using static RepairsManagerUI;
 
 namespace BetterDamage.Patches
@@ -17,7 +18,7 @@ namespace BetterDamage.Patches
         [HarmonyPatch(nameof(Drivetrain.Shift))]
         static void Postfix(Drivetrain __instance, int m_gear)
         {
-            if (!Main.enabled || Main.InReplay || !Main.settings.enableGearboxDamage)
+            if (!Main.enabled || GameEntryPoint.EventManager.status != EventStatus.UNDERWAY || !Main.settings.enableGearboxDamage)
                 return;
 
             Main.Try(() =>
