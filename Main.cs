@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Reflection;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using UnityModManagerNet;
 
 using static UnityModManagerNet.UnityModManager;
@@ -34,6 +35,7 @@ namespace BetterDamage
             modEntry.OnGUI = (entry) => settings.Draw(entry);
             modEntry.OnSaveGUI = (entry) => settings.Save(entry);
 
+            SceneManager.sceneLoaded += (scene, mode) => OverheatManager.lastSceneIndex = scene.buildIndex;
             markers = new List<GameObject>();
             return true;
         }

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
+using static ConditionTypes;
 using static EventStatusEnums;
 using static RepairsManagerUI;
 
@@ -16,6 +17,8 @@ namespace BetterDamage
         const int MIN_TURBO_SPEED = 4; // 30 km/h => 8 m/s
         const int MAX_TURBO_SPEED = 14; // 100 km/hm => 28 m/s
         const float TURBO_DAMAGE_RATE = 0.1f;
+
+        public static int lastSceneIndex;
 
         static List<(int min, int max, float temp)> mapHeatMultipliers = new List<(int, int, float)>()
         {
@@ -107,9 +110,7 @@ namespace BetterDamage
 
             Drivetrain engine = GameEntryPoint.EventManager.playerManager.drivetrain;
             overheatRPMThreshold = engine.maxRPM * Main.settings.overheatRPMThresholdPercent / 100;
-
-            int currentScene = SceneManager.GetActiveScene().buildIndex;
-            (int min, int max, float temp) map = mapHeatMultipliers.Find(item => currentScene >= item.min || currentScene <= item.max);
+            (int min, int max, float temp) map = mapHeatMultipliers.Find(item => lastSceneIndex >= item.min && lastSceneIndex <= item.max);
 
             // in case someone has custom maps
             if (map == (0, 0, 0f))
@@ -120,7 +121,12 @@ namespace BetterDamage
             }
 
             // min = index 3 / max = index 6
-            float mapHeatPercent = Mathf.InverseLerp(mapHeatMultipliers[3].temp, mapHeatMultipliers[6].temp, map.temp);
+            float mapHeatPercent = Mathf.InverseLerp(
+                mapHeatMultipliers[3].temp + GetWeatherTempMod(Weather.Snow),
+                mapHeatMultipliers[6].temp + GetWeatherTempMod(Weather.Afternoon),
+                map.temp + GetWeatherTempMod(GameModeManager.GetRallyDataCurrentGameMode().GetCurrentStage().Weather)
+            );
+
             float thresholdDistance = (Main.settings.overheatRPMThresholdPercent - Main.settings.overheatRPMBalancePercent) / 2;
 
             rpmBalance = Mathf.Lerp(
@@ -129,6 +135,31 @@ namespace BetterDamage
                 mapHeatPercent
             );
             rpmBalance *= engine.maxRPM / 100;
+        }
+
+        static int GetWeatherTempMod(Weather weather)
+        {
+            switch (weather)
+            {
+                case Weather.Snow:
+                    return -3;
+
+                case Weather.Rain:
+                    return -2;
+
+                case Weather.Night:
+                case Weather.Fog:
+                    return -1;
+
+                case Weather.Morning:
+                case Weather.Sunset:
+                    return 0;
+
+                case Weather.Afternoon:
+                    return 1;
+            }
+
+            return 0;
         }
     }
 }
