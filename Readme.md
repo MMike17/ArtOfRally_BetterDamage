@@ -62,12 +62,19 @@ When the RPM is between **overheatRPMThresholdPercent** and **overheatRPMBalance
 - RPM ~ **overheatRPMThresholdPercent** => cooling speed ~ 0
 - RPM ~ **overheatRPMBalancePercent** => cooling speed ~ max
 
-Two factors can affect the efficiency of engine cooling :
+Three factors can affect the efficiency of engine cooling :
 
-- The condition of the radiator - Engine cooling efficiency will go down with the condition of the radiator.
-- The country in which the stage is taking place
+- The **condition of the radiator**.
+	- Engine cooling efficiency will go down with the condition of the radiator.
+- The **country** in which the stage is taking place.
 	- **Cooler** countries (Finland, Norway, etc...) will pull the *balance threshold* up, providing faster cooling.
 	- **Hotter** countries (Kenya, Indonesia, etc...) will lower the *balance threshold*, providing slower cooling.
+- The **weather** of the current stage
+	- **Morning / Sunset** will not change the temperature of the stage.
+	- **Afternoon** will raise the stage temperature.
+	- **Night / Fog** will lower the stage temperature.
+	- **Rain** will lower the stage temperature.
+	- **Snow** will lower the stage temperature the most.
 
 If the car is equiped with a turbo, it is also affected by the overheating status of the engine.
 
@@ -134,13 +141,13 @@ By default, the mod doesn't change the behaviour of the game.
 - **crashPunctureProbability** : is the probability percent that a tire will puncture upon crashing if the crash strength is over the threshold (default 0.5%).
 - **crashHeadlightProbability** : is the probability percent that the headlights will be damaged upon crashing if the crash strength is over the threshold (default 8%).
 
-#### Drift
+### Drift
 
 - **enableDriftDamage** : will enable damages on the car when it drifts. This will display all other settings in this category.
 
 - **driftPunctureProbability** : is the probability percent that a tire will puncture after 20 seconds of drifting (cumulative / default 1%).
 
-#### Overheat
+### Overheat
 
 - **enableOverheatDamage** : will enable the overheat damages to the engine and turbo (if the car has one). Thus will display all other settings in the category.
 
@@ -149,11 +156,11 @@ By default, the mod doesn't change the behaviour of the game.
 - **overheatSpeedMult** : is a multiplier for the speed at which the engine reaches the state of overheating.
 - **overheatCooldownSpeedMult** : is a multiplier for the speed at which the engine can cool down.
 
-#### Gearbox
+### Gearbox
 
 - **enableGearboxDamage** : will enable damages on the gearbox when switching gears.
 
-#### Debug
+### Debug
 
 - **showMarkers** : will display markers around a car (bright red spheres) after a collision. These markers display the edges between damage zones.
 - **disableInfoLogs** : will disable the logging of *info* level logs in the mod manager's console.
