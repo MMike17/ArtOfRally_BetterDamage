@@ -120,6 +120,11 @@ Adjust toggles and settings in each sections to select what damages you want to 
 
 By default, the mod doesn't change the behaviour of the game.
 
+### Support
+
+The game does not support car damage in Freeroam mode.\
+All other game modes should be supported by this mod.
+
 ### General
 
 - **disableWearAndTear** : will disable the damage applied to multiple car parts at the end of a stage (I recommend this to make the damages more fair).\
