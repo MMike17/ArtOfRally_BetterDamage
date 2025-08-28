@@ -103,12 +103,12 @@
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Target Name="CopyInfo" AfterTargets="BeforeBuild">
-    <Copy SourceFiles="Info.json" DestinationFolder="D:\SteamLibrary\steamapps\common\artofrally\Mods\BetterDamage" />
+    <Copy SourceFiles="Info.json" DestinationFolder="C:\Program Files (x86)\Steam\steamapps\common\artofrally\Mods\BetterDamage" />
   </Target>
   <Target Name="CopyDll" AfterTargets="Build">
-    <Copy SourceFiles="bin\Debug\BetterDamage.dll" DestinationFolder="D:\SteamLibrary\steamapps\common\artofrally\Mods\BetterDamage" />
+    <Copy SourceFiles="bin\Debug\BetterDamage.dll" DestinationFolder="C:\Program Files (x86)\Steam\steamapps\common\artofrally\Mods\BetterDamage" />
   </Target>
   <Target Name="StartGame" AfterTargets="AfterBuild">
-    <Exec Command="&quot;D:\Games\Current\art of rally.url&quot;" />
+    <Exec Command="&quot;C:\Program Files (x86)\Steam\steamapps\common\artofrally\artofrally.exe&quot;" />
   </Target>
 </Project>
