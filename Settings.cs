@@ -54,6 +54,8 @@ namespace BetterDamage
         public float overheatSpeedMult = 1;
         [Draw(DrawType.Slider, Min = 0.1f, Max = 1.5f, VisibleOn = "enableOverheatDamage|true", Precision = 1)]
         public float overheatCooldownSpeedMult = 0.7f;
+        [Draw(DrawType.Slider, Min = 1, Max = 10, VisibleOn = "enableOverheatDamage|true")]
+        public float overheatTurboDamageMult = 5;
 
         [Header("Gearbox")]
         [Draw(DrawType.Toggle)]

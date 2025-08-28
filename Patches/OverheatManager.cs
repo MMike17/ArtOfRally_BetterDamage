@@ -83,7 +83,11 @@ namespace BetterDamage
                         if (speedPercent < rpmPercent)
                         {
                             float damagePercent = rpmPercent - speedPercent;
-                            CarUtils.DamagePart(player, damagePercent * TURBO_DAMAGE_RATE * Time.fixedDeltaTime, SystemToRepair.TURBO);
+                            CarUtils.DamagePart(
+                                player,
+                                damagePercent * TURBO_DAMAGE_RATE * Main.settings.overheatTurboDamageMult * Time.fixedDeltaTime,
+                                SystemToRepair.TURBO
+                            );
                         }
                     }
                 }
