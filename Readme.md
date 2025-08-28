@@ -127,13 +127,12 @@ All other game modes should be supported by this mod.
 
 ### General
 
-- **disableWearAndTear** : will disable the damage applied to multiple car parts at the end of a stage (I recommend this to make the damages more fair).\
+- **disableWearAndTear** : will disable the damage applied to multiple car parts at the end of a stage (I recommend this to make the damages more fair).
 - **wearAndTearBody** : will re-enable wear and tear for the car body only (necessitates **disableWearAndTear** to be toggled on).
 
 ### Landing
 
 - **enableLandingDamage** : will enable damages on the car when it lands from a jump. This will display all other settings in this category.
-
 - **minLandingThreshold** : is the minimum landing force to consider damages to the car.
 - **maxLandingThreshold** : is the maximum landing force to consider damages to the car.
 - **landingDamageMultiplier** : is a multiplier for damages dealt by jump landings.
@@ -149,17 +148,16 @@ All other game modes should be supported by this mod.
 ### Drift
 
 - **enableDriftDamage** : will enable damages on the car when it drifts. This will display all other settings in this category.
-
 - **driftPunctureProbability** : is the probability percent that a tire will puncture after 20 seconds of drifting (cumulative / default 1%).
 
 ### Overheat
 
 - **enableOverheatDamage** : will enable the overheat damages to the engine and turbo (if the car has one). Thus will display all other settings in the category.
-
 - **overheatRPMThresholdPercent** : is the engine RPM percent threshold above which the engine will enter overheat status.
 - **overheatRPMBalancePercent** : is the engine RPM percent threshold under which the engine will cool down the most efficiently.
 - **overheatSpeedMult** : is a multiplier for the speed at which the engine reaches the state of overheating.
 - **overheatCooldownSpeedMult** : is a multiplier for the speed at which the engine can cool down.
+- **overheatTurboDamageMult** : is a multiplier for raw turbo damage.
 
 ### Gearbox
 
