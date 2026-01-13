@@ -28,7 +28,8 @@ namespace BetterDamage
             (27, 32, 2.8f), // Norway
             (33, 38, 10.8f), // Germany
             (39, 44, 25.2f), // Kenya
-            (46, 51, 25.9f) // Indonesia
+            (46, 51, 25.9f), // Indonesia
+            (53, 58, 20) // Australia
         };
 
         static PlayerCollider player;
