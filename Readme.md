@@ -99,8 +99,9 @@ Calculations of drifting state and drifting durations are wheel specific.
 
 When shifting gears, the gearbox can take damages in two situations :
 
-- If you shift to a higher gear while throttling and the RPM of the engine is lower than the RPM at which the automatic transmission would shift down. This strains the engine and it will take damage.
-- If you shift to a lower gear and the engine RPM increases close to it's max. This forces the gearbox to absorb the excess speed of the engine and it takes damage.
+- If you shift to a higher gear while throttling and the RPM of the engine is lower than the RPM at which the automatic transmission would shift down. This strains the engine and the gearbox and they will take damage.
+- If you shift to a lower gear and the engine RPM increases close to it's max. This forces the gearbox to absorb the excess speed of the engine and they take damage.
+- If you shift to the reverse gear when your forward speed is too high you'll damage your gearbox.
 
 #### Balancing
 
@@ -162,6 +163,7 @@ All other game modes should be supported by this mod.
 ### Gearbox
 
 - **enableGearboxDamage** : will enable damages on the gearbox when switching gears.
+- **reverseSpeedThreshold** : will change the minimum speed at which switching to reverse will damage the gearbox and affect how much damage you take (lower speed = higher damage).
 
 ### Debug
 
