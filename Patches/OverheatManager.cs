@@ -13,11 +13,12 @@ namespace BetterDamage
     static class OverheatManager
     {
         const float MAX_OVERHEAT = 2f;
-        const float ENGINE_DAMAGE_RATE = 0.02f;
+        const float ENGINE_DAMAGE_RATE = 0.01f;
         const int MIN_TURBO_SPEED = 4; // 30 km/h => 8 m/s
         const int MAX_TURBO_SPEED = 14; // 100 km/hm => 28 m/s
         const float TURBO_DAMAGE_RATE = 0.1f;
 
+        public static float carSpeed { get; private set; }
         public static int lastSceneIndex;
 
         static List<(int min, int max, float temp)> mapHeatMultipliers = new List<(int, int, float)>()
@@ -48,6 +49,11 @@ namespace BetterDamage
                 if (!CheckReady())
                     return;
 
+                carSpeed = Vector3.Project(
+                    GameEntryPoint.EventManager.playerManager.playerRigidBody.velocity,
+                    player.transform.forward
+                ).magnitude;
+
                 if (__instance.rpm >= overheatRPMThreshold)
                     overheatCount = Mathf.MoveTowards(overheatCount, MAX_OVERHEAT, Main.settings.overheatSpeedMult * Time.fixedDeltaTime);
                 else
@@ -73,13 +79,9 @@ namespace BetterDamage
                     if (CarManager.GetCarStatsForCar(GameModeManager.GetSeasonDataCurrentGameMode().SelectedCar).Aspiration !=
                         CarSpecs.EngineAspiration.NATURAL)
                     {
-                        float forwardSpeed = Vector3.Project(
-                            GameEntryPoint.EventManager.playerManager.playerRigidBody.velocity,
-                            player.transform.forward
-                        ).magnitude;
 
                         float rpmPercent = Mathf.InverseLerp(overheatRPMThreshold, __instance.maxRPM, __instance.rpm);
-                        float speedPercent = Mathf.InverseLerp(MIN_TURBO_SPEED, MAX_TURBO_SPEED, forwardSpeed);
+                        float speedPercent = Mathf.InverseLerp(MIN_TURBO_SPEED, MAX_TURBO_SPEED, carSpeed);
 
                         if (speedPercent < rpmPercent)
                         {
