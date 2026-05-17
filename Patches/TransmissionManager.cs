@@ -10,8 +10,8 @@ namespace BetterDamage.Patches
     [HarmonyPatch(typeof(Drivetrain))]
     static class TransmissionManager
     {
-        const float GEARBOX_DAMAGE_RATE = 0.1f;
-        const float ENGINE_DAMAGE_RATE = 0.05f;
+        const float GEARBOX_DAMAGE_RATE = 0.05f;
+        const float ENGINE_DAMAGE_RATE = 0.025f;
         const float SPEED_RATIO = 2.2f;
 
         static Coroutine shiftRoutine;
@@ -77,7 +77,7 @@ namespace BetterDamage.Patches
                             if (!Main.settings.disableInfoLogs)
                                 Main.Log("Detected forced reverse : " + ratio);
 
-                            CarUtils.DamagePart(player, GEARBOX_DAMAGE_RATE * ratio, SystemToRepair.GEARBOX);
+                            CarUtils.DamagePart(player, GEARBOX_DAMAGE_RATE * ratio * Main.settings.gearboxDamageMult, SystemToRepair.GEARBOX);
                             shiftRoutine = null;
                             yield break;
                         }
@@ -95,8 +95,8 @@ namespace BetterDamage.Patches
                             maxRPM = engine.rpm;
                         else
                         {
-                            CarUtils.DamagePart(player, GEARBOX_DAMAGE_RATE * ratio, SystemToRepair.GEARBOX);
-                            CarUtils.DamagePart(player, ENGINE_DAMAGE_RATE * ratio, SystemToRepair.ENGINE);
+                            CarUtils.DamagePart(player, GEARBOX_DAMAGE_RATE * ratio * Main.settings.gearboxDamageMult, SystemToRepair.GEARBOX);
+                            CarUtils.DamagePart(player, ENGINE_DAMAGE_RATE * ratio * Main.settings.gearboxDamageMult, SystemToRepair.ENGINE);
                             shiftRoutine = null;
                             yield break;
                         }
@@ -114,8 +114,8 @@ namespace BetterDamage.Patches
                 if (!Main.settings.disableInfoLogs)
                     Main.Log("Detected under rev with ratio : " + ratio);
 
-                CarUtils.DamagePart(player, GEARBOX_DAMAGE_RATE * ratio, SystemToRepair.GEARBOX);
-                CarUtils.DamagePart(player, ENGINE_DAMAGE_RATE * ratio, SystemToRepair.ENGINE);
+                CarUtils.DamagePart(player, GEARBOX_DAMAGE_RATE * ratio * Main.settings.gearboxDamageMult, SystemToRepair.GEARBOX);
+                CarUtils.DamagePart(player, ENGINE_DAMAGE_RATE * ratio * Main.settings.gearboxDamageMult, SystemToRepair.ENGINE);
             }
 
             shiftRoutine = null;

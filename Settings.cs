@@ -62,6 +62,8 @@ namespace BetterDamage
         public bool enableGearboxDamage = true;
         [Draw(DrawType.Slider, Min = 1, Max = 30, VisibleOn = "enableGearboxDamage|true")]
         public float reverseSpeedThreshold = 15f;
+        [Draw(DrawType.Slider, Min = 0.5f, Max = 1.5f, VisibleOn = "enableGearboxDamage|true")]
+        public float gearboxDamageMult = 1;
 
         [Header("Debug")]
         [Draw(DrawType.Toggle)]
