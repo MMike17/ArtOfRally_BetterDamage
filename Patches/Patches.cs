@@ -2,10 +2,19 @@ using HarmonyLib;
 using System.Reflection;
 using UnityEngine;
 
-// TODO : Make sure suspension tilt resets on restart
-
 namespace BetterDamage
 {
+    // fix restart
+    [HarmonyPatch(typeof(StageScreen), nameof(StageScreen.Restart))]
+    static class RestartPatcher
+    {
+        [HarmonyPrefix]
+        static void FixTiltOnRestart()
+        {
+            (CarUtils.GetPart(RepairsManagerUI.SystemToRepair.SUSPENSION) as SteeringPerfomanceDamage).RevertRallyDataToStartOfStage();
+        }
+    }
+
     // disable wear and tear
     [HarmonyPatch(typeof(PerformanceDamageManager), nameof(PerformanceDamageManager.DoWearAndTearStageDamage))]
     static class Patch

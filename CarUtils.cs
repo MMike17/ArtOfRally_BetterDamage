@@ -25,7 +25,7 @@ namespace BetterDamage
                 "DamageablePartsList",
                 BindingFlags.Instance
             );
-            PerformanceDamage selectedPart = partsList.Find(part => IsPartTarget(part, targetPart));
+            PerformanceDamage selectedPart = GetPart(targetPart);
 
             if (selectedPart == null)
             {
@@ -41,6 +41,16 @@ namespace BetterDamage
                 BindingFlags.Instance,
                 new object[] { totalDamage, index }
             );
+        }
+
+        public static PerformanceDamage GetPart(SystemToRepair target)
+        {
+            List<PerformanceDamage> partsList = Main.GetField<List<PerformanceDamage>, PerformanceDamageManager>(
+                GameEntryPoint.EventManager.playerManager.performanceDamageManager,
+                "DamageablePartsList",
+                BindingFlags.Instance
+            );
+            return partsList.Find(part => IsPartTarget(part, target));
         }
 
         static bool IsPartTarget(PerformanceDamage part, SystemToRepair target)
