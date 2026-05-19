@@ -26,11 +26,11 @@ This mod introduces 5 new events which can damage the car parts as well as modif
 
 Here is a list of the events and the affected car parts :
 
-- **Crash** - suspensions, car body, radiator and gearbox.
-- **Landing** - suspensions and tires.
-- **Overheat** - engine and turbo.
-- **Drifting** - tires.
-- **Shifting gear** - gearbox.
+- **Crash** : suspensions, car body, radiator and transmission.
+- **Landing** : suspensions and tires.
+- **Overheat** : engine and turbo.
+- **Drifting** : tires.
+- **Shifting gear** : transmission and engine.
 
 ### Crash
 
@@ -40,7 +40,7 @@ A crash is triggered when the car hits an obstacle with a strength of at least t
 
 - the frontal zone of the circle (in light blue) will damage the radiator.
 - the side zones of the circle (in light red) will damage the suspensions.
-- the back zone of the circle (in light green) will damage the gearbox.
+- the back zone of the circle (in light green) will damage the transmission.
 
 Regardless of the angle, the body of the car will take damages.
 
@@ -97,19 +97,19 @@ Calculations of drifting state and drifting durations are wheel specific.
 
 ### Shifting gear
 
-When shifting gears, the gearbox can take damages in two situations :
+When shifting gears, the transmission can take damages in two situations :
 
-- If you shift to a higher gear while throttling and the RPM of the engine is lower than the RPM at which the automatic transmission would shift down. This strains the engine and the gearbox and they will take damage.
-- If you shift to a lower gear and the engine RPM increases close to it's max. This forces the gearbox to absorb the excess speed of the engine and they take damage.
-- If you shift to the reverse gear when your forward speed is too high you'll damage your gearbox.
+- If you shift to a higher gear while throttling and the RPM of the engine is lower than the RPM at which the automatic transmission would shift down. This strains the engine and the transmission and they will take damage.
+- If you shift to a lower gear and the engine RPM increases close to it's max. This forces the transmission to absorb the excess speed of the engine and they take damage.
+- If you shift to the reverse gear when your forward speed is too high you'll damage your transmission.
 
 #### Balancing
 
 This section will go into special rules used to balance the damage experience.
 
-- The "wear and tear" game mechanic can be disabled. This mechanic would damage the car at the end of a stage to account for the strain put on the car during the race (engine, radiator, turbo and gearbox).
+- The "wear and tear" game mechanic can be disabled. This mechanic would damage the car at the end of a stage to account for the strain put on the car during the race (engine, radiator, turbo and transmission).
 - Switching to and from neutral and reverse gears are ignored for damages dealt when shifting gears.
-- When shifting up, the damage in case of RPM too low is only inflicted if the player is trying to throttle. Shifting to higher gears while stopped will not damage the gearbox (due to auto-clutch).
+- When shifting up, the damage in case of RPM too low is only inflicted if the player is trying to throttle. Shifting to higher gears while stopped will not damage the transmission (due to auto-clutch).
 - Upon landing, a tire cannot be punctured if another tire is already punctured.
 - During a drift, if a tire is punctured, that same tire cannot be punctured again for 5 minutes.
 - The timers for drifting and ovearheating are reset when restarting or changing stages.
@@ -134,9 +134,9 @@ All other game modes should be supported by this mod.
 ### Landing
 
 - **enableLandingDamage** : will enable damages on the car when it lands from a jump. This will display all other settings in this category.
+- **landingDamageMultiplier** : is a multiplier for damages dealt by jump landings.
 - **minLandingThreshold** : is the minimum landing force to consider damages to the car.
 - **maxLandingThreshold** : is the maximum landing force to consider damages to the car.
-- **landingDamageMultiplier** : is a multiplier for damages dealt by jump landings.
 - **landingPunctureThreshold** : is the landing strength percent threshold above which a tire can be punctured upon landing (default 90%).
 - **landingPunctureProbability** : is the probability percent that a tire will puncture upon landing if the landing strength is over the threshold (default 0.5%).
 
@@ -154,16 +154,18 @@ All other game modes should be supported by this mod.
 ### Overheat
 
 - **enableOverheatDamage** : will enable the overheat damages to the engine and turbo (if the car has one). Thus will display all other settings in the category.
+- **overheatEngineDamageMult** : is a multiplier for raw engine damage.
+- **overheatTurboDamageMult** : is a multiplier for raw turbo damage.
 - **overheatRPMThresholdPercent** : is the engine RPM percent threshold above which the engine will enter overheat status.
 - **overheatRPMBalancePercent** : is the engine RPM percent threshold under which the engine will cool down the most efficiently.
 - **overheatSpeedMult** : is a multiplier for the speed at which the engine reaches the state of overheating.
 - **overheatCooldownSpeedMult** : is a multiplier for the speed at which the engine can cool down.
-- **overheatTurboDamageMult** : is a multiplier for raw turbo damage.
 
-### Gearbox
+### transmission
 
-- **enableGearboxDamage** : will enable damages on the gearbox when switching gears.
-- **reverseSpeedThreshold** : will change the minimum speed at which switching to reverse will damage the gearbox and affect how much damage you take (lower speed = higher damage).
+- **enabletransmissionDamage** : will enable damages on the transmission when switching gears.
+- **gearboxDamageMult** : is a multiplier for raw transmission damage.
+- **reverseSpeedThreshold** : will change the minimum speed at which switching to reverse will damage the transmission and affect how much damage you take (lower speed = higher damage).
 
 ### Debug
 
