@@ -16,13 +16,13 @@ namespace BetterDamage
         [Header("Landing")]
         [Draw(DrawType.Toggle)]
         public bool enableLandingDamage = true;
+        [Draw(DrawType.Slider, Min = 0, Max = 2, VisibleOn = "enableLandingDamage|true", Precision = 0)]
+        public float landingDamageMultiplier = 1;
         [Space]
         [Draw(DrawType.Slider, Min = 3, Max = 8, VisibleOn = "enableLandingDamage|true", Precision = 1)]
         public float minLandingThreshold = 5;
         [Draw(DrawType.Slider, Min = 5, Max = 20, VisibleOn = "enableLandingDamage|true", Precision = 1)]
         public float maxLandingThreshold = 13;
-        [Draw(DrawType.Slider, Min = 0, Max = 2, VisibleOn = "enableLandingDamage|true", Precision = 0)]
-        public float landingDamageMultiplier = 1;
         [Space]
         [Draw(DrawType.Slider, Min = 0, Max = 100, VisibleOn = "enableLandingDamage|true", Precision = 0)]
         public float landingPunctureThreshold = 90;
@@ -46,6 +46,11 @@ namespace BetterDamage
         [Header("Overheat")]
         [Draw(DrawType.Toggle)]
         public bool enableOverheatDamage = true;
+        [Draw(DrawType.Slider, Min = 0.5f, Max = 3, VisibleOn = "enableOverheatDamage|true")]
+        public float overheatEngineDamageMult = 1;
+        [Draw(DrawType.Slider, Min = 1, Max = 10, VisibleOn = "enableOverheatDamage|true")]
+        public float overheatTurboDamageMult = 5;
+        [Space]
         [Draw(DrawType.Slider, Min = 75, Max = 85, VisibleOn = "enableOverheatDamage|true", Precision = 0)]
         public float overheatRPMThresholdPercent = 82;
         [Draw(DrawType.Slider, Min = 50, Max = 80, VisibleOn = "enableOverheatDamage|true", Precision = 0)]
@@ -54,16 +59,15 @@ namespace BetterDamage
         public float overheatSpeedMult = 1;
         [Draw(DrawType.Slider, Min = 0.1f, Max = 1.5f, VisibleOn = "enableOverheatDamage|true", Precision = 1)]
         public float overheatCooldownSpeedMult = 0.7f;
-        [Draw(DrawType.Slider, Min = 1, Max = 10, VisibleOn = "enableOverheatDamage|true")]
-        public float overheatTurboDamageMult = 5;
 
         [Header("Gearbox")]
         [Draw(DrawType.Toggle)]
         public bool enableGearboxDamage = true;
-        [Draw(DrawType.Slider, Min = 1, Max = 30, VisibleOn = "enableGearboxDamage|true")]
-        public float reverseSpeedThreshold = 15f;
         [Draw(DrawType.Slider, Min = 0.5f, Max = 1.5f, VisibleOn = "enableGearboxDamage|true")]
         public float gearboxDamageMult = 1;
+        [Space]
+        [Draw(DrawType.Slider, Min = 1, Max = 30, VisibleOn = "enableGearboxDamage|true")]
+        public float reverseSpeedThreshold = 15f;
 
         [Header("Debug")]
         [Draw(DrawType.Toggle)]

@@ -2,6 +2,8 @@ using HarmonyLib;
 using System.Reflection;
 using UnityEngine;
 
+// TODO : Make sure suspension tilt resets on restart
+
 namespace BetterDamage
 {
     // disable wear and tear

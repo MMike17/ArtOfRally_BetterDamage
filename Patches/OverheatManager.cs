@@ -74,7 +74,11 @@ namespace BetterDamage
 
                 if (overheatCount >= MAX_OVERHEAT)
                 {
-                    CarUtils.DamagePart(player, ENGINE_DAMAGE_RATE * Time.fixedDeltaTime, SystemToRepair.ENGINE);
+                    CarUtils.DamagePart(
+                        player,
+                        ENGINE_DAMAGE_RATE * Main.settings.overheatEngineDamageMult * Time.fixedDeltaTime,
+                        SystemToRepair.ENGINE
+                    );
 
                     if (CarManager.GetCarStatsForCar(GameModeManager.GetSeasonDataCurrentGameMode().SelectedCar).Aspiration !=
                         CarSpecs.EngineAspiration.NATURAL)

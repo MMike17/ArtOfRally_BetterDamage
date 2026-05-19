@@ -64,7 +64,7 @@ namespace BetterDamage
                         }
 
                         if (Main.settings.enableGearboxDamage && (damageAngle < backSlice.x || damageAngle > backSlice.y))
-                            CarUtils.DamagePart(__instance, magnitudePercent, SystemToRepair.GEARBOX);
+                            CarUtils.DamagePart(__instance, magnitudePercent * Main.settings.gearboxDamageMult, SystemToRepair.GEARBOX);
 
                         // Can't damage body more than that...
                         CarUtils.DamagePart(__instance, magnitudePercent, SystemToRepair.CLEANCAR);
