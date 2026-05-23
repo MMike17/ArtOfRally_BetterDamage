@@ -11,7 +11,19 @@ namespace BetterDamage
         [HarmonyPrefix]
         static void FixTiltOnRestart()
         {
-            (CarUtils.GetPart(RepairsManagerUI.SystemToRepair.SUSPENSION) as SteeringPerfomanceDamage).RevertRallyDataToStartOfStage();
+            Main.Try(() =>
+            {
+                SteeringPerfomanceDamage steering = CarUtils.GetPart(RepairsManagerUI.SystemToRepair.SUSPENSION) as SteeringPerfomanceDamage;
+                steering.RevertRallyDataToStartOfStage();
+
+                float startTilt = Main.GetField<float, SteeringPerfomanceDamage>(
+                    steering,
+                    "steeringAlignmentEffectAtStartOfStage",
+                    BindingFlags.Instance
+                );
+
+                GameEntryPoint.EventManager.playerManager.PlayerObject.GetComponent<AxisCarController>().SteeringOutOfAlignmentEffect = startTilt;
+            });
         }
     }
 
