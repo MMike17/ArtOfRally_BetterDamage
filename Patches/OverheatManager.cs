@@ -19,7 +19,6 @@ namespace BetterDamage
         const float TURBO_DAMAGE_RATE = 0.1f;
 
         public static float carSpeed { get; private set; }
-        public static int lastSceneIndex;
 
         static List<(int min, int max, float temp)> mapHeatMultipliers = new List<(int, int, float)>()
         {
@@ -119,9 +118,10 @@ namespace BetterDamage
             if (player == null)
                 return;
 
+            int sceneIndex = SceneManager.GetActiveScene().buildIndex;
             Drivetrain engine = GameEntryPoint.EventManager.playerManager.drivetrain;
             overheatRPMThreshold = engine.maxRPM * Main.settings.overheatRPMThresholdPercent / 100;
-            (int min, int max, float temp) map = mapHeatMultipliers.Find(item => lastSceneIndex >= item.min && lastSceneIndex <= item.max);
+            (int min, int max, float temp) map = mapHeatMultipliers.Find(item => sceneIndex >= item.min && sceneIndex <= item.max);
 
             // in case someone has custom maps
             if (map == (0, 0, 0f))
